@@ -29,5 +29,9 @@
     "next": "Next",
     "editOnGitHub": "Edit this page on GitHub",
     "onThisPage": "On this page"
+  },
+  "others": {
+    "copyCode": "Copy",
+    "copiedCode": "Copied!"
   }
 }

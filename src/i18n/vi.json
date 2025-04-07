@@ -29,5 +29,9 @@
     "next": "Tiếp",
     "editOnGitHub": "Chỉnh sửa trang này trên GitHub",
     "onThisPage": "Trong trang này"
+  },
+  "others": {
+    "copyCode": "Sao chép",
+    "copiedCode": "Đã sao chép!"
   }
 }

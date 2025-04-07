@@ -45,7 +45,7 @@ const navItems: NavItem[] = [
           vi: 'Khái niệm cốt lõi',
           en: 'Core Concepts'
         },
-        href: '/docs/core-concepts'
+        href: '/docs/core-concepts',
       },
       {
         title: {
@@ -68,20 +68,23 @@ const navItems: NavItem[] = [
       vi: 'Hướng dẫn nâng cao',
       en: 'Advanced Guide'
     },
+    isNew: true,
     children: [
       {
         title: {
           vi: 'Xây dựng ứng dụng',
           en: 'Building Applications'
         },
-        href: '/docs/building-applications'
+        href: '/docs/building-applications',
+        isNew: true,
       },
       {
         title: {
           vi: 'Kỹ thuật nâng cao',
           en: 'Advanced Techniques'
         },
-        href: '/docs/advanced-techniques'
+        href: '/docs/advanced-techniques',
+        isNew: true,
       },
     ],
   },
@@ -152,7 +155,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
         isOpen ? 'translate-x-0' : '-translate-x-full'
       )}
     >
-      <nav className="p-4 space-y-6">
+      <nav className="p-4 space-y-4">
         {navItems.map((section, i) => {
           // Kiểm tra nếu đây là menu có con và có mục con đang active
           const isActive = section.href === currentPath;
@@ -167,17 +170,17 @@ export default function Sidebar({ isOpen }: SidebarProps) {
                 <Link
                   to={section.href}
                   className={cn(
-                    "group flex items-center justify-between py-2 px-3 text-sm font-medium rounded-md transition-colors",
+                    "group flex items-center justify-between px-4 py-3 text-sm font-medium rounded-md transition-colors w-full",
                     isActive
                       ? "bg-primary/10 text-primary"
                       : "text-foreground hover:bg-muted"
                   )}
                   activeProps={{ className: "bg-primary/10 text-primary" }}
                 >
-                  <span className="flex items-center gap-2">
+                  <span className="flex items-center gap-2 w-full">
                     {sectionTitle}
                     {section.isNew && (
-                      <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-primary/20 text-primary">
+                      <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-primary/20 text-primary ml-auto translate-x-1">
                         Mới
                       </span>
                     )}
@@ -188,16 +191,16 @@ export default function Sidebar({ isOpen }: SidebarProps) {
                   type="button"
                   onClick={(e) => toggleSection(sectionId, e)}
                   className={cn(
-                    "flex items-center justify-between w-full py-2 px-3 text-sm font-medium rounded-md transition-colors",
+                    "flex items-center justify-between w-full px-4 py-3 text-sm font-medium rounded-md transition-colors",
                     hasActiveChild
                       ? "bg-primary/10 text-primary"
                       : "text-foreground hover:bg-muted"
                   )}
                 >
-                  <span className="flex items-center gap-2">
+                  <span className="flex items-center gap-2 w-full">
                     {sectionTitle}
                     {section.isNew && (
-                      <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-primary/20 text-primary">
+                      <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-primary/20 text-primary ml-auto -translate-x-1">
                         Mới
                       </span>
                     )}
@@ -231,17 +234,17 @@ export default function Sidebar({ isOpen }: SidebarProps) {
                               key={j}
                               to={item.href || ''}
                               className={cn(
-                                "block py-1.5 px-3 text-sm rounded-md transition-all",
+                                "block py-1 px-2 text-sm rounded-md transition-all",
                                 isItemActive
-                                  ? "bg-primary/10 text-primary font-medium"
+                                  ? "font-medium"
                                   : "text-muted-foreground hover:text-foreground hover:bg-muted"
                               )}
-                              activeProps={{ className: "bg-primary/10 text-primary font-medium" }}
+                              activeProps={{ className: "font-medium" }}
                             >
                               <div className="flex items-center justify-between">
-                                <span>{itemTitle}</span>
+                                <span className={isItemActive ? "underline underline-offset-4" : ""}>{itemTitle}</span>
                                 {item.isNew && (
-                                  <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-primary/20 text-primary">
+                                  <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-primary/20 text-primary no-underline">
                                     Mới
                                   </span>
                                 )}

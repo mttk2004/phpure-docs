@@ -1,60 +1,63 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 
-export type Theme = 'light' | 'dark';
+type Theme = 'light' | 'dark';
 
-export interface UseThemeReturn {
-  theme: Theme;
-  setTheme: (theme: Theme) => void;
-  toggleTheme: () => void;
-  isDark: boolean;
-  isLight: boolean;
-}
+// Tạo một đối tượng event để thông báo khi theme thay đổi
+const themeChangeEvent = new Event('themeChange');
 
-export function useTheme(): UseThemeReturn {
-  const [theme, setThemeState] = useState<Theme>(() => {
-    // Lấy theme từ localStorage nếu có
-    const savedTheme = localStorage.getItem('theme') as Theme;
+export function useTheme() {
+  const [theme, setTheme] = useState<Theme>('dark');
 
-    // Kiểm tra cài đặt theme của hệ thống nếu không có trong localStorage
-    if (!savedTheme) {
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      return prefersDark ? 'dark' : 'light';
-    }
+  // Hàm để lấy theme hiện tại
+  const getTheme = (): Theme => {
+    const savedTheme = localStorage.getItem('theme') as Theme | null;
+    const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
+      ? 'dark'
+      : 'light';
+    return savedTheme || systemTheme;
+  };
 
-    return savedTheme;
-  });
+  // Hàm để áp dụng theme
+  const applyTheme = (newTheme: Theme) => {
+    document.documentElement.classList.toggle('dark', newTheme === 'dark');
+    setTheme(newTheme);
+  };
 
-  const isDark = theme === 'dark';
-  const isLight = theme === 'light';
+  useEffect(() => {
+    // Áp dụng theme khi component mount
+    const currentTheme = getTheme();
+    applyTheme(currentTheme);
 
-  // Cập nhật theme trong localStorage và DOM
-  const setTheme = useCallback((newTheme: Theme) => {
-    setThemeState(newTheme);
-    localStorage.setItem('theme', newTheme);
+    // Lắng nghe sự kiện thay đổi theme
+    const handleThemeChange = () => {
+      const updatedTheme = getTheme();
+      applyTheme(updatedTheme);
+    };
+
+    // Lắng nghe sự kiện thay đổi trong localStorage
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'theme') {
+        handleThemeChange();
+      }
+    });
+
+    // Lắng nghe sự kiện thay đổi theme từ bên trong ứng dụng
+    window.addEventListener('themeChange', handleThemeChange);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('storage', handleThemeChange);
+      window.removeEventListener('themeChange', handleThemeChange);
+    };
   }, []);
 
-  const toggleTheme = useCallback(() => {
-    setTheme(isDark ? 'light' : 'dark');
-  }, [isDark, setTheme]);
-
-  // Cập nhật DOM khi theme thay đổi
-  useEffect(() => {
-    const root = window.document.documentElement;
-
-    if (isDark) {
-      root.classList.add('dark');
-      root.classList.remove('light');
-    } else {
-      root.classList.add('light');
-      root.classList.remove('dark');
-    }
-  }, [isDark]);
-
-  return {
-    theme,
-    setTheme,
-    toggleTheme,
-    isDark,
-    isLight,
+  const toggleTheme = () => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('theme', newTheme);
+    applyTheme(newTheme);
+    // Phát ra sự kiện thay đổi theme
+    window.dispatchEvent(themeChangeEvent);
   };
+
+  return { theme, toggleTheme };
 }

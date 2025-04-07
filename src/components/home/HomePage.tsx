@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from '@tanstack/react-router';
-import { ArrowRight, Github, Package, Zap, Code, Star, Copy, Check } from 'lucide-react';
+import { ArrowRight, Github, Package, Zap, Code, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { CodeBlock } from '@/components/ui/CodeBlock';
 import { GITHUB_REPO_URL } from '@/utils';
 
 // Mã PHP mẫu
@@ -24,23 +23,57 @@ class HomeController extends Controller
     }
 }`;
 
+// Mã PHP mẫu ngắn hơn cho thiết bị di động
+const phpCodeExampleMobile = `<?php
+namespace App\\Controllers;
+use Core\\Controller;
+
+class HomeController extends Controller
+{
+    public function index(): void
+    {
+        $this->render('home', [
+          'title' => 'Home',
+          'message' => 'Welcome!',
+        ]);
+    }
+}`;
+
 export default function HomePage() {
-  // State để kiểm soát trạng thái sao chép
-  const [copied, setCopied] = useState(false);
   // State cho hiệu ứng typing
   const [displayCode, setDisplayCode] = useState('');
   const [typingComplete, setTypingComplete] = useState(false);
   const [skipAnimation, setSkipAnimation] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Kiểm tra kích thước màn hình
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    // Kiểm tra khi component mount
+    checkMobile();
+
+    // Thêm event listener để kiểm tra khi thay đổi kích thước màn hình
+    window.addEventListener('resize', checkMobile);
+
+    // Cleanup
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Xác định mã code sẽ sử dụng dựa trên thiết bị
+  const activeCodeExample = isMobile ? phpCodeExampleMobile : phpCodeExample;
 
   // Hiệu ứng typing với tốc độ tối ưu hơn
   useEffect(() => {
     if (skipAnimation) {
-      setDisplayCode(phpCodeExample);
+      setDisplayCode(activeCodeExample);
       setTypingComplete(true);
       return;
     }
 
-    if (displayCode.length < phpCodeExample.length) {
+    if (displayCode.length < activeCodeExample.length) {
       const timeout = setTimeout(() => {
         // Tăng tốc độ typing theo thời gian
         const charsToAdd = Math.min(
@@ -49,22 +82,15 @@ export default function HomePage() {
         );
         const newLength = Math.min(
           displayCode.length + charsToAdd,
-          phpCodeExample.length
+          activeCodeExample.length
         );
-        setDisplayCode(phpCodeExample.slice(0, newLength));
+        setDisplayCode(activeCodeExample.slice(0, newLength));
       }, 10);
       return () => clearTimeout(timeout);
     } else {
       setTypingComplete(true);
     }
-  }, [displayCode, skipAnimation]);
-
-  // Hàm xử lý sao chép mã
-  const handleCopyCode = () => {
-    navigator.clipboard.writeText(phpCodeExample);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+  }, [displayCode, skipAnimation, activeCodeExample]);
 
   // Hàm xử lý skip animation
   const handleSkipAnimation = () => {
@@ -74,7 +100,7 @@ export default function HomePage() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero section */}
-      <section className="w-full pt-12 md:pt-16 pb-20 border-b border-border">
+      <section className="w-full pt-8 md:pt-12 pb-20 border-b border-border">
         <div className="container px-4 mx-auto">
           <div className="max-w-3xl mx-auto mb-10 text-center">
             <div className="inline-flex items-center justify-center px-3 py-1 mb-6 text-sm rounded-full bg-muted">
@@ -120,15 +146,15 @@ export default function HomePage() {
           </div>
 
           <div className="relative mx-auto overflow-hidden border rounded-lg shadow-lg border-border bg-glassmorphism backdrop-blur-sm max-w-4xl">
-            <div className="relative bg-muted">
+            <div className="relative bg-muted overflow-hidden">
               <div className="flex items-center justify-start p-2 space-x-1.5 bg-background/80 border-b border-border">
                 <div className="w-3 h-3 rounded-full bg-red-500"></div>
                 <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
                 <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                <div className="ml-2 text-xs font-medium text-muted-foreground">example.php</div>
+                <div className="ml-2 text-sm font-medium text-muted-foreground font-script">example.php</div>
               </div>
 
-              <div className="relative font-mono">
+              <div className="relative font-mono w-full overflow-hidden">
                 <div className="absolute top-2 right-2 z-10 flex gap-2">
                   {!typingComplete && (
                     <button
@@ -140,55 +166,19 @@ export default function HomePage() {
                       Skip
                     </button>
                   )}
-                  <button
-                    type="button"
-                    onClick={handleCopyCode}
-                    className="p-1.5 rounded-md bg-background/80 text-xs font-medium hover:bg-primary hover:text-primary-foreground transition-colors"
-                    aria-label="Copy code"
-                  >
-                    {copied ? (
-                      <Check className="h-4 w-4" />
-                    ) : (
-                      <Copy className="h-4 w-4" />
-                    )}
-                  </button>
                 </div>
 
-                <SyntaxHighlighter
-                  language="php"
-                  style={vscDarkPlus}
-                  customStyle={{
-                    margin: 0,
-                    padding: '1rem',
-                    borderRadius: 0,
-                    fontSize: '0.875rem',
-                    fontFamily: "'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace",
-                    backgroundColor: '#1E1E1E', // VS Code background color
-                    transition: 'all 0.2s ease-in-out'
-                  }}
-                  wrapLines={true}
-                  lineProps={() => ({
-                    style: { display: 'block' },
-                    className: 'syntax-line'
-                  })}
-                  showLineNumbers={true}
-                  lineNumberStyle={{
-                    minWidth: '2.5em',
-                    paddingRight: '1em',
-                    color: '#858585',
-                    textAlign: 'right',
-                    userSelect: 'none'
-                  }}
-                >
-                  {typingComplete || skipAnimation ? phpCodeExample : displayCode}
-                </SyntaxHighlighter>
-
-                {!typingComplete && !skipAnimation && (
-                  <div
-                    className="absolute bottom-0 right-0 h-4 w-2 bg-primary animate-pulse"
-                    style={{ margin: '0 0 1rem 0' }}
+                <div className="w-full">
+                  <CodeBlock
+                    code={activeCodeExample}
+                    language="php"
+                    showLineNumbers={true}
+                    animatedCode={displayCode}
+                    isTypingComplete={typingComplete}
+                    skipAnimation={skipAnimation}
+                    showCopyButton={true}
                   />
-                )}
+                </div>
               </div>
             </div>
           </div>
@@ -209,8 +199,8 @@ export default function HomePage() {
 
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             <div className="p-6 border rounded-lg bg-background border-border">
-              <div className="mb-4 inline-flex items-center justify-center w-10 h-10 rounded-md bg-primary/10 text-primary">
-                <Zap className="h-5 w-5" />
+              <div className="mb-4 inline-flex items-center justify-center w-12 h-12 rounded-md bg-primary/10 text-primary">
+                <Zap className="h-6 w-6" />
               </div>
               <h3 className="mb-2 text-xl font-semibold">Hiệu suất cao</h3>
               <p className="text-muted-foreground">
@@ -219,8 +209,8 @@ export default function HomePage() {
             </div>
 
             <div className="p-6 border rounded-lg bg-background border-border">
-              <div className="mb-4 inline-flex items-center justify-center w-10 h-10 rounded-md bg-primary/10 text-primary">
-                <Package className="h-5 w-5" />
+              <div className="mb-4 inline-flex items-center justify-center w-12 h-12 rounded-md bg-primary/10 text-primary">
+                <Package className="h-6 w-6" />
               </div>
               <h3 className="mb-2 text-xl font-semibold">Nhẹ nhàng</h3>
               <p className="text-muted-foreground">
@@ -229,8 +219,8 @@ export default function HomePage() {
             </div>
 
             <div className="p-6 border rounded-lg bg-background border-border">
-              <div className="mb-4 inline-flex items-center justify-center w-10 h-10 rounded-md bg-primary/10 text-primary">
-                <Code className="h-5 w-5" />
+              <div className="mb-4 inline-flex items-center justify-center w-12 h-12 rounded-md bg-primary/10 text-primary">
+                <Code className="h-6 w-6" />
               </div>
               <h3 className="mb-2 text-xl font-semibold">Dễ học, dễ sử dụng</h3>
               <p className="text-muted-foreground">

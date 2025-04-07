@@ -1,97 +1,154 @@
 @import "tailwindcss";
+@import "./styles/fonts.css";
+
+@theme {
+  --color-primary: #0c83f2;
+  --color-primary-dark: #085ca9;
+  --color-primary-foreground: #fff;
+  --color-secondary: #885bd6;
+  --color-secondary-dark: #5f4096;
+  --color-accent: #3edfcf;
+  --color-accent-dark: #2b9c91;
+
+  --color-bg: #edf6f9;
+  --color-text: #181f30;
+
+  --color-gray-50: #f7f9fb;
+  --color-gray-100: #e0e7ef;
+  --color-gray-200: #ccd4e0;
+  --color-gray-300: #a0aebf;
+  --color-gray-400: #7f8ea2;
+  --color-gray-500: #627082;
+  --color-gray-600: #495463;
+  --color-gray-700: #374151;
+  --color-gray-800: #2d3748;
+  --color-gray-900: #0e1629;
+
+  --color-success: #20c55c;
+  --color-success-dark: #168a40;
+  --color-warning: #f9b238;
+  --color-warning-dark: #c78e2d;
+  --color-error: #ee4343;
+  --color-error-dark: #a72f2f;
+  --color-info: #49c1fd;
+  --color-info-dark: #3a9aca;
+
+  --color-white: #fff;
+  --color-dark: #000;
+}
 
 @layer base {
   :root {
     /* Base */
-    --background: 0 0% 100%;
-    --foreground: 222 47% 11%;
+    --background: var(--color-bg);
+    --foreground: var(--color-text);
 
     /* Card */
-    --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card: var(--color-bg);
+    --card-foreground: var(--color-text);
 
     /* Popover */
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover:  var(--color-bg);
+    --popover-foreground: var(--color-text);
 
     /* Border */
-    --border: 214 32% 91%;
+    --border: var(--color-gray-200);
 
     /* Input */
-    --input: 214 32% 91%;
+    --input: var(--color-gray-200);
 
-    /* Primary - Blue 500 (#3182CE) */
-    --primary: 209 90% 50%;
-    --primary-foreground: 0 0% 100%;
+    /* Primary */
+    --primary: var(--color-primary);
+    --primary-foreground: var(--color-white);
 
-    /* Secondary - Purple 500 (#805AD5) */
-    --secondary: 262 60% 60%;
-    --secondary-foreground: 0 0% 100%;
+    /* Secondary */
+    --secondary: var(--color-secondary);
+    --secondary-foreground: var(--color-white);
 
     /* Muted */
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215 16% 47%;
+    --muted: var(--color-gray-700);
+    --muted-foreground: var(--color-gray-100);
 
-    /* Accent - Teal 400 (#4FD1C5) */
-    --accent: 174 72% 56%;
-    --accent-foreground: 222 47% 11%;
+    /* Accent */
+    --accent: var(--color-accent);
+    --accent-foreground: var(--color-white);
 
     /* Destructive */
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive: var(--color-error);
+    --destructive-foreground: var(--color-gray-200);
+
+    /* Success */
+    --success: var(--color-success);
+    --success-foreground: var(--color-gray-200);
+
+    /* Warning */
+    --warning: var(--color-warning);
+    --warning-foreground: var(--color-gray-200);
+
+    /* Info */
+    --info: var(--color-info);
+    --info-foreground: var(--color-gray-200);
 
     /* Ring */
-    --ring: 209 90% 50%;
+    --ring: var(--color-primary);
 
     /* Border Radius */
-    --radius: 0.5rem;
+    --radius: var(--radius, 0.5rem);
   }
-
   .dark {
     /* Base */
-    --background: 222 47% 11%;
-    --foreground: 210 40% 98%;
+    --background: var(--color-text);
+    --foreground: var(--color-bg);
 
     /* Card */
-    --card: 222 47% 11%;
-    --card-foreground: 210 40% 98%;
+    --card: var(--color-text);
+    --card-foreground: var(--color-bg);
 
     /* Popover */
-    --popover: 222 47% 11%;
-    --popover-foreground: 210 40% 98%;
+    --popover: var(--color-text);
+    --popover-foreground: var(--color-bg);
 
     /* Border */
-    --border: 217 33% 17%;
+    --border: var(--color-white);
 
     /* Input */
-    --input: 217 33% 17%;
+    --input: var(--color-white);
 
-    /* Primary - Blue 400 (#4299E1) */
-    --primary: 209 84% 57%;
-    --primary-foreground: 0 0% 100%;
+    /* Primary */
+    --primary: var(--color-primary-dark);
+    --primary-foreground: var(--color-white);
 
-    /* Secondary - Purple 400 (#9F7AEA) */
-    --secondary: 269 70% 70%;
-    --secondary-foreground: 0 0% 100%;
+    /* Secondary */
+    --secondary: var(--color-secondary-dark);
+    --secondary-foreground: var(--color-white);
 
     /* Muted */
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
+    --muted: var(--color-gray-800);
+    --muted-foreground: var(--color-white);
 
-    /* Accent - Teal 300 (#66E3D9) */
-    --accent: 174 72% 65%;
-    --accent-foreground: 222 47% 11%;
+    /* Accent */
+    --accent: var(--color-accent-dark);
+    --accent-foreground: var(--color-white);
 
     /* Destructive */
-    --destructive: 0 70% 45%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: var(--color-error-dark);
+    --destructive-foreground: var(--color-gray-200);
+
+    /* Success */
+    --success: var(--color-success-dark);
+    --success-foreground: var(--color-gray-200);
+
+    /* Warning */
+    --warning: var(--color-warning-dark);
+    --warning-foreground: var(--color-gray-200);
+
+    /* Info */
+    --info: var(--color-info-dark);
+    --info-foreground: var(--color-gray-200);
 
     /* Ring */
-    --ring: 209 84% 57%;
+    --ring: var(--color-primary-dark);
   }
-}
-
-@layer base {
 
   html {
     -webkit-font-smoothing: antialiased;
@@ -100,14 +157,15 @@
   }
 
   body {
-    font-family: 'Work Sans', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-    color: hsl(var(--foreground));
-    background-color: hsl(var(--background));
+    font-family: var(--font-body, 'Work Sans', system-ui, -apple-system, BlinkMacSystemFont, sans-serif);
+    color: var(--foreground);
+    background-color: var(--background);
     line-height: 1.6;
     font-size: 16px;
   }
 
   h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading, 'Work Sans', system-ui, -apple-system, BlinkMacSystemFont, sans-serif);
     line-height: 1.2;
     font-weight: 600;
   }
@@ -115,6 +173,34 @@
   a {
     color: inherit;
     text-decoration: none;
+  }
+
+  code, pre {
+    font-family: 'Cascadia Code', mon;
+  }
+
+  /* Đảm bảo không bị overflow trên thiết bị di động */
+  html, body {
+    overflow-x: hidden;
+    position: relative;
+    width: 100%;
+  }
+
+  body {
+    max-width: 100vw;
+  }
+
+  /* Đảm bảo các thành phần code không gây overflow */
+  code, pre {
+    max-width: 100%;
+    overflow-wrap: break-word;
+  }
+
+  @media (max-width: 768px) {
+    pre, code {
+      word-break: break-word;
+      white-space: pre-wrap;
+    }
   }
 }
 
@@ -124,10 +210,28 @@
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    background-image: linear-gradient(to right, var(--primary), var(--accent));
   }
 
   .text-gradient-primary {
-    background-image: linear-gradient(to right, hsl(var(--primary)), hsl(var(--accent)));
+    background-image: linear-gradient(to right, var(--primary), var(--accent));
+  }
+
+  .text-gradient-secondary {
+    background-image: linear-gradient(to right, var(--secondary), var(--primary));
+  }
+
+  /* Shadows */
+  .shadow-soft {
+    box-shadow: 0 2px 10px rgba(var(--foreground) / 0.08);
+  }
+
+  .shadow-medium {
+    box-shadow: 0 4px 20px rgba(var(--foreground) / 0.12);
+  }
+
+  .shadow-hard {
+    box-shadow: 0 8px 30px rgba(var(--foreground) / 0.16);
   }
 
   /* Glassmorphism */
@@ -141,6 +245,25 @@
     background-color: rgba(0, 0, 0, 0.2);
     border-color: rgba(255, 255, 255, 0.05);
   }
+
+  /* Transitions */
+  .transition-fast {
+    transition: all 0.15s ease-in-out;
+  }
+
+  .transition-medium {
+    transition: all 0.3s ease-in-out;
+  }
+
+  .transition-slow {
+    transition: all 0.5s ease-in-out;
+  }
+
+  /* Focus Ring Styles */
+  /* .focus-ring {
+    @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2;
+    @apply focus-visible:ring-primary focus-visible:ring-opacity-75;
+  } */
 
   /* Scrollbar */
   .scrollbar-thin {
@@ -157,63 +280,57 @@
   }
 
   .scrollbar-thin::-webkit-scrollbar-thumb {
-    background-color: hsl(var(--muted-foreground) / 0.3);
+    background-color: rgba(var(--muted-foreground) / 0.3);
     border-radius: 9999px;
   }
 
   .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-    background-color: hsl(var(--muted-foreground) / 0.5);
+    background-color: rgba(var(--muted-foreground) / 0.5);
   }
-}
 
-/* Các animation đơn giản */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
+  /* Các animation đơn giản */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  @keyframes slideInFromLeft {
+    from { transform: translateX(-10px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+  .animate-slide-in {
+    animation: slideInFromLeft 0.3s ease-out;
+  }
+  /* Code highlighting styles */
+  .code-block {
+    position: relative;
+    border-radius: 0.25rem;
+    overflow: hidden;
+  }
+  .code-block pre {
+    margin: 0 !important;
+  }
+  /* Hiệu ứng dòng code khi hover */
+  .syntax-line:hover {
+    background-color: rgba(255, 255, 255, 0.07);
+  }
+  /* Tùy chỉnh màu sắc của token PHP nếu cần */
+  .token.php-keyword {
+    color: #569CD6;
+  }
+  .token.php-variable {
+    color: #9CDCFE;
+  }
+  .token.php-string {
+    color: #CE9178;
+  }
+  .token.php-function {
+    color: #DCDCAA;
+  }
 
-.animate-fade-in {
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-@keyframes slideInFromLeft {
-  from { transform: translateX(-10px); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
-
-.animate-slide-in {
-  animation: slideInFromLeft 0.3s ease-out;
-}
-
-/* Code highlighting styles */
-.code-block {
-  position: relative;
-  border-radius: 0.25rem;
-  overflow: hidden;
-}
-
-.code-block pre {
-  margin: 0 !important;
-}
-
-/* Hiệu ứng dòng code khi hover */
-.syntax-line:hover {
-  background-color: rgba(255, 255, 255, 0.07);
-}
-
-/* Tùy chỉnh màu sắc của token PHP nếu cần */
-.token.php-keyword {
-  color: #569CD6;
-}
-
-.token.php-variable {
-  color: #9CDCFE;
-}
-
-.token.php-string {
-  color: #CE9178;
-}
-
-.token.php-function {
-  color: #DCDCAA;
+  .font-script {
+    font-family: 'Cascadia Code', monospace;
+  }
 }

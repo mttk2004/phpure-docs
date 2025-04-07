@@ -11,7 +11,7 @@ interface HeaderProps {
 }
 
 export default function Header({ isSidebarOpen, onMenuClick }: HeaderProps) {
-  const { toggleTheme, isDark } = useTheme();
+  const { theme, toggleTheme } = useTheme();
   const { toggleLanguage, isVietnamese } = useLanguage();
   const [themeAnimating, setThemeAnimating] = useState(false);
   const [langAnimating, setLangAnimating] = useState(false);
@@ -88,13 +88,13 @@ export default function Header({ isSidebarOpen, onMenuClick }: HeaderProps) {
             size="icon"
             onClick={handleThemeToggle}
             className={`rounded-full overflow-hidden transition-all cursor-pointer ${themeAnimating ? 'scale-90' : 'scale-100'}`}
-            title={isDark ? "Chuyển sang chế độ sáng" : "Chuyển sang chế độ tối"}
+            title={theme === 'dark' ? "Chuyển sang chế độ sáng" : "Chuyển sang chế độ tối"}
           >
             <Sun
-              className={`h-4 w-4 transition-transform duration-300 ${isDark ? 'rotate-0 scale-100' : 'rotate-90 scale-0'}`}
+              className={`h-4 w-4 transition-transform duration-300 ${theme === 'dark' ? 'rotate-0 scale-100' : 'rotate-90 scale-0'}`}
             />
             <Moon
-              className={`absolute h-4 w-4 transition-transform duration-300 ${isDark ? 'rotate-90 scale-0' : 'rotate-0 scale-100'}`}
+              className={`absolute h-4 w-4 transition-transform duration-300 ${theme === 'dark' ? 'rotate-90 scale-0' : 'rotate-0 scale-100'}`}
             />
             <span className="sr-only">Chuyển đổi giao diện</span>
           </Button>

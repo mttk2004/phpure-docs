@@ -1,0 +1,112 @@
+.codeContainer {
+  position: relative;
+  font-family: 'Cascadia Code', monospace !important;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.syntaxLine {
+  font-family: 'Cascadia Code', monospace !important;
+  line-height: 1.6 !important; /* Chuẩn hóa line-height cho cả light và dark theme */
+}
+
+/* Override cho SyntaxHighlighter */
+.codeContainer :global(pre),
+.codeContainer :global(code),
+.codeContainer :global(span) {
+  font-family: 'Cascadia Code', monospace !important;
+}
+
+/* Fix lỗi font-size cho token */
+.codeContainer :global(.token) {
+  font-size: inherit !important;
+}
+
+/* Fix cho line number */
+.codeContainer :global(.linenumber) {
+  font-style: normal !important; /* Bỏ kiểu italic */
+  opacity: 0.6 !important; /* Làm mờ hơn */
+  font-family: 'Cascadia Code', monospace !important;
+}
+
+/* Animation cho nút copy */
+.copyButton {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 10;
+  padding: 0.375rem 0.5rem;
+  border-radius: 0.375rem;
+  background-color: var(--background);
+  color: var(--foreground);
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.copyButton:hover {
+  /* background-color: var(--background); */
+  color: var(--text);
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.copyButtonSuccess {
+  background-color: var(--success);
+  color: var(--text);
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive: Ẩn văn bản trên màn hình nhỏ */
+@media (max-width: 640px) {
+  .copyButton span {
+    display: none !important;
+  }
+
+  .copyButton {
+    padding: 0.375rem;
+  }
+}
+
+/* Thêm animation nhẹ cho token */
+.codeContainer :global(.token) {
+  transition: all 0.1s ease-in-out;
+}
+
+.syntaxLine:hover :global(.token) {
+  color: var(--foreground);
+}
+
+/* Media query cho thiết bị di động */
+@media (max-width: 768px) {
+  .codeContainer {
+    font-size: 0.875rem !important;
+  }
+
+  .codeContainer :global(pre) {
+    max-width: 100%;
+    word-wrap: break-word !important;
+    white-space: pre-wrap !important;
+  }
+
+  .codeContainer :global(code) {
+    word-wrap: break-word !important;
+    white-space: pre-wrap !important;
+  }
+
+  .codeContainer :global(.token) {
+    word-break: break-all !important;
+    white-space: normal !important;
+  }
+
+  .syntaxLine {
+    word-wrap: break-word !important;
+    word-break: break-all !important;
+    white-space: pre-wrap !important;
+  }
+}
