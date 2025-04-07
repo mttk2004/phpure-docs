@@ -52,7 +52,7 @@ export default function Layout({ children }: LayoutProps) {
       <div className="flex flex-1 pt-16">
         <Sidebar isOpen={isSidebarOpen} />
 
-        <main className="flex-1 lg:pl-[288px] transition-all duration-300 ease-in-out">
+        <main className="flex-1 lg:pl-80 transition-all duration-300 ease-in-out">
           <div className="container mx-auto px-4 py-8">
             {children}
           </div>

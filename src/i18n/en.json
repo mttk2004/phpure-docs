@@ -23,5 +23,11 @@
     "buildingApplications": "Building Applications",
     "advancedTechniques": "Advanced Techniques",
     "api": "API Reference"
+  },
+  "docs": {
+    "previous": "Previous",
+    "next": "Next",
+    "editOnGitHub": "Edit this page on GitHub",
+    "onThisPage": "On this page"
   }
 }

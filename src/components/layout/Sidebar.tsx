@@ -148,11 +148,11 @@ export default function Sidebar({ isOpen }: SidebarProps) {
   return (
     <aside
       className={cn(
-        'fixed top-16 bottom-0 left-0 z-30 w-full max-w-xs overflow-y-auto border-r border-border bg-background/95 backdrop-blur-sm lg:translate-x-0 transition-transform duration-300 ease-in-out',
+        'fixed top-16 bottom-0 left-0 z-30 w-full max-w-72 overflow-y-auto border-r border-border bg-background/95 backdrop-blur-sm lg:translate-x-0 transition-transform duration-300 ease-in-out',
         isOpen ? 'translate-x-0' : '-translate-x-full'
       )}
     >
-      <nav className="p-6 space-y-6">
+      <nav className="p-4 space-y-6">
         {navItems.map((section, i) => {
           // Kiểm tra nếu đây là menu có con và có mục con đang active
           const isActive = section.href === currentPath;

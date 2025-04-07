@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from '@tanstack/react-router';
 import { ArrowLeft, ArrowRight, Edit, ChevronRight } from 'lucide-react';
 import { GITHUB_REPO_URL } from '@/utils';
+import { useTranslation } from 'react-i18next';
 
 interface DocNavItem {
   title: string;
@@ -34,12 +35,14 @@ export default function DocLayout({
   next,
   toc,
 }: DocLayoutProps) {
+  const { t } = useTranslation();
+
   return (
     <div className="relative w-full max-w-5xl mx-auto">
       {/* Đường dẫn */}
       <div className="flex items-center text-sm text-muted-foreground mb-6">
         <Link to="/docs" className="hover:text-foreground transition-colors">
-          Tài liệu
+          {t('common.docs')}
         </Link>
         <ChevronRight className="h-4 w-4 mx-1" />
         <span className="font-medium text-foreground">{title}</span>
@@ -68,7 +71,7 @@ export default function DocLayout({
                 >
                   <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
                     <ArrowLeft className="h-4 w-4" />
-                    <span>Trước</span>
+                    <span>{t('docs.previous')}</span>
                   </div>
                   <span className="font-medium">{prev.title}</span>
                 </Link>
@@ -80,7 +83,7 @@ export default function DocLayout({
                   className="flex flex-col p-4 border border-border rounded-lg hover:bg-muted transition-colors text-right"
                 >
                   <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1 justify-end">
-                    <span>Tiếp</span>
+                    <span>{t('docs.next')}</span>
                     <ArrowRight className="h-4 w-4" />
                   </div>
                   <span className="font-medium">{next.title}</span>
@@ -99,7 +102,7 @@ export default function DocLayout({
                 className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 <Edit className="h-4 w-4" />
-                <span>Chỉnh sửa trang này trên GitHub</span>
+                <span>{t('docs.editOnGitHub')}</span>
               </a>
             </div>
           )}
@@ -109,7 +112,7 @@ export default function DocLayout({
         {toc && toc.length > 0 && (
           <div className="hidden md:block">
             <div className="sticky top-24">
-              <h3 className="text-sm font-semibold mb-4">Trong trang này</h3>
+              <h3 className="text-sm font-semibold mb-4">{t('docs.onThisPage')}</h3>
               <ul className="space-y-4 text-sm">
                 {toc.map((section, i) => (
                   <li key={i} className="space-y-2">

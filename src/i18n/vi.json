@@ -23,5 +23,11 @@
     "buildingApplications": "Xây dựng ứng dụng",
     "advancedTechniques": "Kỹ thuật nâng cao",
     "api": "Tham khảo API"
+  },
+  "docs": {
+    "previous": "Trước",
+    "next": "Tiếp",
+    "editOnGitHub": "Chỉnh sửa trang này trên GitHub",
+    "onThisPage": "Trong trang này"
   }
 }

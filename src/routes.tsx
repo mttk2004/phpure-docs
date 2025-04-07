@@ -1,7 +1,7 @@
 import { RouterProvider, createRouter } from '@tanstack/react-router';
 
 // Import routes
-import { Route as rootRoute } from './routes/index';
+import { Route as rootRoute } from './routes/__root';
 import { Route as docsRoute } from './routes/docs';
 import { Route as homeRoute } from './routes/index.home';
 import { Route as introductionRoute } from './routes/docs.introduction';
