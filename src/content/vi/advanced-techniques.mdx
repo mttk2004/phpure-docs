@@ -1,0 +1,340 @@
+export const meta = {
+  title: "Kỹ thuật Nâng cao",
+  description:
+    "Khám phá các kỹ thuật và mẫu thiết kế nâng cao để xây dựng ứng dụng phức tạp hơn với PHPure",
+  slug: "advanced-techniques",
+};
+
+# Kỹ thuật Nâng cao
+
+## Quan hệ Nhiều-nhiều trong Cơ sở dữ liệu
+
+Để làm việc với quan hệ nhiều-nhiều, bạn có thể sử dụng phương thức `belongsToMany()` trong model:
+
+```php
+// Model User
+public function roles()
+{
+    return $this->belongsToMany(
+        Role::class,    // Model liên quan
+        'user_roles',   // Bảng trung gian
+        'user_id',      // Khóa ngoại của bảng hiện tại
+        'role_id',      // Khóa ngoại của bảng liên quan
+        'id',           // Khóa chính của bảng hiện tại
+        'id'            // Khóa chính của bảng liên quan
+    );
+}
+
+// Cách sử dụng
+$user = User::find(1);
+$roles = $user->roles();
+```
+
+## Middleware Phân quyền
+
+Tạo middleware để kiểm tra quyền của người dùng:
+
+```php
+<?php
+
+namespace App\Middlewares;
+
+use Core\Http\Middleware;
+use Core\Session;
+use App\Models\User;
+
+class RoleMiddleware extends Middleware
+{
+    private array $allowedRoles;
+
+    public function __construct(array $allowedRoles)
+    {
+        $this->allowedRoles = $allowedRoles;
+    }
+
+    public function handle(): bool
+    {
+        $userId = Session::get('user_id');
+
+        if (!$userId) {
+            redirect('/login');
+            return false;
+        }
+
+        $user = User::find($userId);
+        $userRoles = $user->roles();
+
+        foreach ($userRoles as $role) {
+            if (in_array($role->name, $this->allowedRoles)) {
+                return true;
+            }
+        }
+
+        abort(403); // Từ chối truy cập
+        return false;
+    }
+}
+
+// Đăng ký middleware
+Middleware::register('role', \App\Middlewares\RoleMiddleware::class);
+
+// Sử dụng trong route
+$router->get('/admin', ['AdminController', 'index'])->middleware('role:admin,super_admin');
+```
+
+## Giao diện Dòng lệnh (CLI)
+
+Bạn có thể tạo lệnh CLI cho PHPure để tự động hóa các tác vụ:
+
+```php
+<?php
+// commands/generate.php
+
+require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../utils/helpers.php';
+
+// Xử lý tham số dòng lệnh
+$command = $argv[1] ?? null;
+$name = $argv[2] ?? null;
+
+if (!$command || !$name) {
+    echo "Cách sử dụng: php commands/generate.php [controller|model|middleware] [name]\n";
+    exit(1);
+}
+
+switch ($command) {
+    case 'controller':
+        generateController($name);
+        break;
+    case 'model':
+        generateModel($name);
+        break;
+    case 'middleware':
+        generateMiddleware($name);
+        break;
+    default:
+        echo "Lệnh không hợp lệ. Các lệnh hợp lệ: controller, model, middleware\n";
+        exit(1);
+}
+
+function generateController($name)
+{
+    $template = <<<PHP
+<?php
+
+namespace App\Controllers;
+
+use Core\Controller;
+
+class {$name}Controller extends Controller
+{
+    public function index()
+    {
+        \$this->render('{$name}s/index');
+    }
+
+    public function show(\$id)
+    {
+        \$this->render('{$name}s/show', ['id' => \$id]);
+    }
+
+    public function create()
+    {
+        \$this->render('{$name}s/create');
+    }
+
+    public function store()
+    {
+        // Xử lý logic
+    }
+}
+PHP;
+
+    $filename = __DIR__ . "/../app/Controllers/{$name}Controller.php";
+    file_put_contents($filename, $template);
+    echo "Controller {$name}Controller đã được tạo thành công!\n";
+}
+
+// Tương tự cho generateModel và generateMiddleware
+```
+
+## Phát triển API
+
+PHPure có thể được sử dụng để phát triển RESTful API:
+
+```php
+// API Controller
+class ApiController extends Controller
+{
+    public function __construct()
+    {
+        // Thiết lập content type JSON
+        header('Content-Type: application/json');
+    }
+
+    protected function json($data, $statusCode = 200)
+    {
+        http_response_code($statusCode);
+        echo json_encode($data);
+        exit;
+    }
+
+    protected function unauthorized()
+    {
+        return $this->json(['error' => 'Không được phép truy cập'], 401);
+    }
+
+    protected function notFound()
+    {
+        return $this->json(['error' => 'Không tìm thấy tài nguyên'], 404);
+    }
+}
+
+// Ví dụ về endpoint API
+class UsersApiController extends ApiController
+{
+    public function index()
+    {
+        $users = User::all();
+        return $this->json(['data' => $users]);
+    }
+
+    public function show($id)
+    {
+        $user = User::find($id);
+
+        if (!$user) {
+            return $this->notFound();
+        }
+
+        return $this->json(['data' => $user]);
+    }
+}
+
+// Routes cho API
+$router->get('api/users', ['UsersApiController', 'index']);
+$router->get('api/users/{id}', ['UsersApiController', 'show']);
+```
+
+## Tạo các Helper tùy chỉnh
+
+Bạn có thể mở rộng PHPure bằng cách tạo các hàm helper của riêng mình:
+
+```php
+// utils/helpers.php
+
+if (!function_exists('asset')) {
+    /**
+     * Tạo URL cho một tài nguyên tĩnh
+     *
+     * @param string $path Đường dẫn đến tài nguyên
+     * @return string URL đầy đủ đến tài nguyên
+     */
+    function asset($path)
+    {
+        $baseUrl = rtrim(getenv('APP_URL') ?: '', '/');
+        return $baseUrl . '/assets/' . ltrim($path, '/');
+    }
+}
+
+if (!function_exists('config')) {
+    /**
+     * Lấy giá trị cấu hình
+     *
+     * @param string $key Khóa cấu hình (định dạng dấu chấm)
+     * @param mixed $default Giá trị mặc định nếu không tìm thấy khóa
+     * @return mixed Giá trị cấu hình
+     */
+    function config($key, $default = null)
+    {
+        static $config = null;
+
+        if ($config === null) {
+            $config = require_once __DIR__ . '/../config/app.php';
+        }
+
+        $keys = explode('.', $key);
+        $value = $config;
+
+        foreach ($keys as $segment) {
+            if (!isset($value[$segment])) {
+                return $default;
+            }
+            $value = $value[$segment];
+        }
+
+        return $value;
+    }
+}
+```
+
+## Service Provider tùy chỉnh
+
+Đối với các ứng dụng lớn hơn, bạn có thể muốn triển khai mẫu service provider để đăng ký và khởi tạo các dịch vụ:
+
+```php
+<?php
+
+// core/ServiceProvider.php
+namespace Core;
+
+abstract class ServiceProvider
+{
+    abstract public function register();
+
+    public function boot()
+    {
+        // Mặc định, không làm gì
+    }
+}
+
+// Ví dụ về service provider
+class MailServiceProvider extends ServiceProvider
+{
+    public function register()
+    {
+        // Đăng ký dịch vụ mail
+        App::bind('mail', function() {
+            return new MailService(
+                getenv('MAIL_HOST'),
+                getenv('MAIL_PORT'),
+                getenv('MAIL_USERNAME'),
+                getenv('MAIL_PASSWORD')
+            );
+        });
+    }
+
+    public function boot()
+    {
+        // Cấu hình mẫu mail
+        $mailService = App::resolve('mail');
+        $mailService->setTemplatesPath(__DIR__ . '/../resources/views/emails');
+    }
+}
+
+// Đăng ký service provider trong App.php
+public static function bootstrap()
+{
+    // Đăng ký service provider
+    $providers = [
+        \App\Providers\AppServiceProvider::class,
+        \App\Providers\RouteServiceProvider::class,
+        \App\Providers\MailServiceProvider::class,
+    ];
+
+    foreach ($providers as $provider) {
+        $instance = new $provider();
+        $instance->register();
+    }
+
+    // Khởi động service provider
+    foreach ($providers as $provider) {
+        $instance = new $provider();
+        $instance->boot();
+    }
+
+    // Tiếp tục với bootstrap...
+}
+```
+
+Với những kỹ thuật nâng cao này, bạn sẽ có thể mở rộng và phát triển các ứng dụng PHPure của mình để đáp ứng các yêu cầu phức tạp hơn.

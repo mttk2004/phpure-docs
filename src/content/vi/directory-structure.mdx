@@ -1,0 +1,163 @@
+export const meta = {
+  title: "Cấu trúc thư mục",
+  description: "Khám phá cấu trúc thư mục của framework PHPure",
+  slug: "directory-structure",
+};
+
+# Cấu trúc thư mục
+
+Cấu trúc thư mục của **PHPure** được thiết kế để đảm bảo **tính nhất quán, dễ hiểu và khả năng mở rộng tối ưu**. Mô hình MVC (Model-View-Controller) được áp dụng làm nền tảng, giúp phân tách rõ ràng các thành phần xử lý logic, giao diện và dữ liệu. Điều này không chỉ giúp quản lý dự án hiệu quả mà còn tạo tiền đề cho việc mở rộng khi ứng dụng phát triển.
+
+## Tổng quan
+
+Dưới đây là tổng quan về cấu trúc thư mục của PHPure:
+
+```plaintext
+phpure/
+├── app/                        # Mã ứng dụng cụ thể
+│   ├── Controllers/            # Chứa các lớp xử lý logic ứng dụng
+│   ├── Listeners/              # Chứa các lớp lắng nghe và xử lý sự kiện
+│   ├── Middlewares/            # Chứa các lớp middleware để xử lý HTTP requests
+│   ├── Models/                 # Chứa các lớp model để tương tác với cơ sở dữ liệu
+│   ├── events.php              # File đăng ký và quản lý các sự kiện ứng dụng
+│   ├── routes.php              # File định nghĩa các route ứng dụng
+├── config/                     # Các file cấu hình
+│   ├── app.php                 # Cấu hình ứng dụng chính
+│   ├── cache.php               # Cấu hình cache
+│   ├── database.php            # Cấu hình kết nối cơ sở dữ liệu
+│   ├── paths.php               # Cấu hình đường dẫn ứng dụng
+│   ├── phinx.php               # Cấu hình công cụ migration Phinx
+│   ├── storage.php             # Cấu hình lưu trữ file
+├── core/                       # Các thành phần cốt lõi của framework
+│   ├── Http/
+│   │   ├── Middleware.php      # Lớp quản lý middleware
+│   │   ├── Request.php         # Lớp xử lý HTTP requests
+│   │   ├── Response.php        # Lớp tạo và gửi HTTP responses
+│   │   ├── ResponseCode.php    # Định nghĩa mã trạng thái HTTP
+│   │   ├── Router.php          # Lớp định tuyến để ánh xạ URL đến controller
+│   ├── App.php                 # Lớp framework cốt lõi khởi động ứng dụng
+│   ├── Cache.php               # Lớp quản lý cache
+│   ├── Controller.php          # Lớp controller cơ sở
+│   ├── Database.php            # Query builder và quản lý kết nối cơ sở dữ liệu
+│   ├── Event.php               # Hệ thống quản lý sự kiện
+│   ├── ExceptionHandler.php    # Xử lý ngoại lệ và lỗi
+│   ├── Form.php                # Tiện ích xử lý form
+│   ├── Logger.php              # Chức năng ghi log
+│   ├── Model.php               # Lớp model cơ sở với chức năng ORM
+│   ├── Pagination.php          # Trợ giúp phân trang cho danh sách dữ liệu
+│   ├── Session.php             # Quản lý phiên
+│   ├── Storage.php             # Quản lý lưu trữ file
+│   ├── Twig.php                # Tích hợp template engine Twig
+│   ├── Validation.php          # Tiện ích xác thực dữ liệu
+├── database/                   # Migrations và seeds cơ sở dữ liệu
+│   ├── migrations/             # File thay đổi cấu trúc cơ sở dữ liệu
+│   ├── seeds/                  # File tạo dữ liệu mẫu
+├── docs/                       # File tài liệu
+│   ├── index.md                # Trang chủ tài liệu
+│   ├── introduction.md         # Giới thiệu framework
+│   ├── getting-started.md      # Hướng dẫn bắt đầu
+│   ├── directory-structure.md  # File này - tổng quan cấu trúc thư mục
+│   ├── core-concepts.md        # Giải thích các khái niệm cốt lõi
+│   ├── features.md             # Tài liệu các tính năng
+│   ├── building-applications.md # Hướng dẫn xây dựng ứng dụng
+│   ├── advanced-techniques.md  # Kỹ thuật sử dụng nâng cao
+├── public/                     # File có thể truy cập công khai
+│   ├── assets/                 # Tài nguyên đã biên dịch (CSS, JS, hình ảnh)
+│   ├── index.php               # File đầu vào khởi động ứng dụng
+│   ├── .htaccess               # Cấu hình máy chủ Apache cho URL rewriting
+├── resources/                  # File tài nguyên thô
+│   ├── css/                    # File nguồn CSS
+│   ├── js/                     # File nguồn JavaScript
+│   ├── views/                  # File template Twig
+├── storage/                    # Lưu trữ ứng dụng
+│   ├── cache/                  # Lưu trữ cache
+│   ├── logs/                   # File log
+│   ├── uploads/                # File người dùng tải lên
+├── utils/                      # Hàm tiện ích và helpers
+│   ├── helpers.php             # Hàm helper toàn cục
+├── vendor/                     # Dependencies Composer
+├── .env                        # Cấu hình dành riêng cho môi trường
+├── .env.example                # Ví dụ cấu hình môi trường
+├── .gitignore                  # Quy tắc bỏ qua Git
+├── composer.json               # Dependencies Composer và metadata dự án
+├── LICENSE                     # File giấy phép
+├── package.json                # Dependencies npm và scripts
+├── phinx.php                   # File cấu hình Phinx ở thư mục gốc (chuyển hướng đến config/phinx.php)
+├── postcss.config.js           # Cấu hình PostCSS
+├── README.md                   # Readme dự án
+├── tailwind.config.js          # Cấu hình Tailwind CSS
+├── vite.config.js              # Cấu hình công cụ bundler Vite
+```
+
+## Thư mục và File chính
+
+### Thư mục App
+
+Thư mục `app/` chứa mã ứng dụng chính mà bạn sẽ làm việc nhiều nhất:
+
+- **Controllers/**: Chứa các controller xử lý HTTP request, xử lý đầu vào và trả về response. Mỗi controller thường tương ứng với một tài nguyên hoặc phần cụ thể của ứng dụng.
+- **Listeners/**: Chứa các listener sự kiện phản hồi các sự kiện được kích hoạt trong suốt ứng dụng.
+- **Middlewares/**: Chứa các lớp middleware xử lý HTTP request trước khi chúng đến controller. Middleware hữu ích cho các tác vụ như xác thực, làm sạch đầu vào và bảo vệ CSRF.
+- **Models/**: Chứa các lớp model tương tác với cơ sở dữ liệu và đại diện cho dữ liệu ứng dụng.
+- **events.php**: Đăng ký các listener sự kiện với hệ thống sự kiện.
+- **routes.php**: Định nghĩa các route cho ứng dụng, ánh xạ URL đến các controller action.
+
+### Thư mục Config
+
+Thư mục `config/` chứa tất cả các file cấu hình cho ứng dụng:
+
+- **app.php**: Cấu hình ứng dụng chính bao gồm cài đặt môi trường, xử lý lỗi và các tùy chọn toàn cục khác.
+- **cache.php**: Cấu hình cache bao gồm drivers và đường dẫn lưu trữ.
+- **database.php**: Cài đặt kết nối cơ sở dữ liệu.
+- **paths.php**: Định nghĩa các đường dẫn hệ thống tệp quan trọng được sử dụng trong ứng dụng.
+- **phinx.php**: Cấu hình cho công cụ migration cơ sở dữ liệu Phinx.
+- **storage.php**: Cài đặt cấu hình lưu trữ file.
+
+### Thư mục Core
+
+Thư mục `core/` chứa các thành phần cốt lõi của framework cung cấp sức mạnh cho ứng dụng:
+
+- **Http/**: Chứa các lớp liên quan đến HTTP để xử lý request và response.
+- **App.php**: Lớp bootstrap chính khởi tạo và chạy ứng dụng.
+- **Cache.php**: Cung cấp chức năng caching để cải thiện hiệu suất ứng dụng.
+- **Controller.php**: Lớp controller cơ sở với chức năng controller phổ biến.
+- **Database.php**: Query builder và quản lý kết nối cơ sở dữ liệu.
+- **Model.php**: Lớp model cơ sở với khả năng ORM (Object-Relational Mapping).
+- **Twig.php**: Tích hợp với template engine Twig để hiển thị views.
+- **Validation.php**: Tiện ích xác thực dữ liệu để đảm bảo dữ liệu đầu vào hợp lệ.
+
+### Thư mục Public
+
+Thư mục `public/` là thư mục gốc tài liệu cho ứng dụng. Nó chứa các file có thể truy cập trực tiếp từ web:
+
+- **assets/**: Chứa tài nguyên đã biên dịch như CSS, JavaScript và hình ảnh.
+- **index.php**: Điểm vào cho tất cả các HTTP request đến ứng dụng.
+- **.htaccess**: Cấu hình máy chủ Apache cho URL rewriting.
+
+### Thư mục Resources
+
+Thư mục `resources/` chứa tài nguyên thô, chưa biên dịch:
+
+- **css/**: File nguồn CSS, có thể sử dụng Tailwind hoặc các framework CSS khác.
+- **js/**: File nguồn JavaScript.
+- **views/**: Template Twig để hiển thị response HTML.
+
+### Thư mục Storage
+
+Thư mục `storage/` chứa các file được tạo bởi ứng dụng:
+
+- **cache/**: Lưu trữ cache dựa trên file.
+- **logs/**: File log ứng dụng.
+- **uploads/**: File người dùng tải lên.
+
+### Các File quan trọng khác
+
+- **.env**: Chứa các biến cấu hình dành riêng cho môi trường.
+- **composer.json**: Định nghĩa các phụ thuộc PHP và cài đặt autoloading.
+- **package.json**: Định nghĩa các phụ thuộc JavaScript và build scripts.
+- **tailwind.config.js**: Cấu hình cho Tailwind CSS.
+- **vite.config.js**: Cấu hình cho công cụ build front-end Vite.
+
+```
+
+```

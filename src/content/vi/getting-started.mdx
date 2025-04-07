@@ -1,0 +1,88 @@
+export const meta = {
+  title: "Bắt đầu với PHPure",
+  description: "Học cách cài đặt và cấu hình framework PHPure",
+  slug: "getting-started",
+};
+
+# Bắt đầu với PHPure
+
+Hướng dẫn này sẽ giúp bạn thiết lập và bắt đầu sử dụng PHPure cho việc phát triển ứng dụng web của bạn.
+
+## Yêu cầu hệ thống
+
+Trước khi cài đặt và sử dụng PHPure, hãy đảm bảo môi trường làm việc của bạn đáp ứng các yêu cầu sau:
+
+- **PHP**: Tối thiểu phiên bản 8.0.
+- **Composer**: Tối thiểu phiên bản 2.8.4.
+- **npm**: Tối thiểu phiên bản 11.0.0.
+
+Đảm bảo rằng các công cụ này được cài đặt với phiên bản chính xác sẽ giúp bạn tránh được các lỗi cài đặt và đảm bảo ứng dụng hoạt động ổn định.
+
+## Cài đặt
+
+Bắt đầu bằng cách mở terminal hoặc command prompt và chạy các lệnh sau:
+
+```bash
+git clone https://github.com/mttk2004/phpure.git
+cd phpure
+```
+
+- **`git clone`**: Tải toàn bộ mã nguồn PHPure từ GitHub về máy tính của bạn.
+- **`cd phpure`**: Di chuyển đến thư mục chứa mã nguồn đã tải về.
+
+Sau khi hoàn thành bước này, bạn đã sẵn sàng để tiếp tục với việc thiết lập dự án và cài đặt các dependencies.
+
+## Cấu hình
+
+### Cài đặt Dependencies
+
+Sử dụng các lệnh sau để cài đặt tất cả các dependencies cần thiết:
+
+```bash
+composer install
+npm install
+```
+
+- **`composer install`**: Tải về tất cả các thư viện PHP cần thiết cho dự án hoạt động.
+- **`npm install`**: Cài đặt các gói front-end hỗ trợ giao diện hoặc công cụ build.
+
+Các lệnh này sẽ đảm bảo rằng bạn có tất cả các công cụ cần thiết để phát triển và vận hành ứng dụng.
+
+### Cấu hình File `.env`
+
+Dự án sử dụng file `.env` để lưu trữ thông tin cấu hình quan trọng như thông tin cơ sở dữ liệu, môi trường ứng dụng và các tham số khác. Để tạo file `.env`, hãy chạy lệnh sau:
+
+```bash
+cp .env.example .env
+```
+
+Tiếp theo, mở file `.env` vừa tạo và cập nhật các tham số để phù hợp với môi trường của bạn. Dưới đây là một ví dụ về cấu hình cơ sở dữ liệu:
+
+```env
+# APP
+APP_ENV=development
+
+# DATABASE
+DB_ADAPTER=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_NAME=my_database
+DB_USER=root
+DB_PASS=
+DB_CHARSET=utf8mb4
+```
+
+Một số lưu ý quan trọng:
+
+- File `.env` chứa thông tin nhạy cảm, như mật khẩu cơ sở dữ liệu, vì vậy bạn cần bảo mật nó và tránh chia sẻ công khai.
+- PHPure tự động thêm `.env` vào `.gitignore`, ngăn bạn tải file này lên GitHub.
+
+### Cấu hình Phinx
+
+PHPure sử dụng **Phinx**, một công cụ quản lý cơ sở dữ liệu mạnh mẽ, để thực hiện các tác vụ như tạo bảng, thêm cột hoặc sửa đổi cấu trúc cơ sở dữ liệu.
+
+Cấu hình Phinx được lưu trữ trong file `phinx.php`. Tuy nhiên, bạn không cần phải chỉnh sửa file này trực tiếp vì tất cả thông tin được tự động cấu hình thông qua file `.env`.
+
+Phinx là một phần quan trọng trong quản lý cơ sở dữ liệu của PHPure. Nó giúp tự động hóa quy trình, giảm thao tác thủ công và đảm bảo tính nhất quán.
+
+Sau khi hoàn thành các bước này, bạn đã sẵn sàng để bắt đầu hành trình phát triển với PHPure! 🚀

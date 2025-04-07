@@ -1,0 +1,27 @@
+{
+  "common": {
+    "home": "Home",
+    "docs": "Documentation",
+    "examples": "Examples",
+    "search": "Search",
+    "darkMode": "Dark Mode",
+    "lightMode": "Light Mode"
+  },
+  "home": {
+    "title": "PHPure Framework",
+    "subtitle": "A lightweight MVC framework for PHP",
+    "getStarted": "Get Started",
+    "viewDocs": "View Documentation",
+    "features": "Features"
+  },
+  "navigation": {
+    "introduction": "Introduction",
+    "gettingStarted": "Getting Started",
+    "directoryStructure": "Directory Structure",
+    "coreConcepts": "Core Concepts",
+    "features": "Features",
+    "buildingApplications": "Building Applications",
+    "advancedTechniques": "Advanced Techniques",
+    "api": "API Reference"
+  }
+}

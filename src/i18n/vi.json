@@ -1,0 +1,27 @@
+{
+  "common": {
+    "home": "Trang chủ",
+    "docs": "Tài liệu",
+    "examples": "Ví dụ",
+    "search": "Tìm kiếm",
+    "darkMode": "Chế độ tối",
+    "lightMode": "Chế độ sáng"
+  },
+  "home": {
+    "title": "PHPure Framework",
+    "subtitle": "Framework MVC nhẹ cho PHP",
+    "getStarted": "Bắt đầu",
+    "viewDocs": "Xem tài liệu",
+    "features": "Tính năng"
+  },
+  "navigation": {
+    "introduction": "Giới thiệu",
+    "gettingStarted": "Bắt đầu",
+    "directoryStructure": "Cấu trúc thư mục",
+    "coreConcepts": "Khái niệm cốt lõi",
+    "features": "Tính năng",
+    "buildingApplications": "Xây dựng ứng dụng",
+    "advancedTechniques": "Kỹ thuật nâng cao",
+    "api": "Tham khảo API"
+  }
+}

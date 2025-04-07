@@ -1,0 +1,254 @@
+export const meta = {
+  title: "Tính năng hữu ích",
+  description:
+    "Khám phá các tính năng hữu ích được cung cấp bởi framework PHPure",
+  slug: "features",
+};
+
+# Tính năng hữu ích
+
+Ngoài các tính năng cốt lõi đã được trình bày, PHPure còn cung cấp nhiều công cụ hữu ích khác để giúp bạn phát triển ứng dụng một cách nhanh chóng và dễ dàng. Trong phần này, chúng ta sẽ khám phá một số tính năng thú vị này.
+
+## Flash Messages
+
+Flash messages là các thông báo tạm thời được hiển thị một lần sau khi điều hướng trang, rất hữu ích để truyền đạt kết quả của một hành động. PHPure cung cấp phương thức `flash()` trong lớp `Session` để quản lý các thông báo này:
+
+```php
+// Đặt flash message trong controller
+Session::flash('success', 'Đăng ký người dùng thành công!');
+redirect('/login');
+
+// Trong view, hiển thị thông báo (với Twig)
+{% if flash('success') %}
+    <div class="alert alert-success">
+        {{ flash('success') }}
+    </div>
+{% endif %}
+```
+
+Flash messages rất hữu ích trong các tình huống như:
+
+- Hiển thị thông báo thành công sau khi thêm, cập nhật hoặc xóa dữ liệu
+- Hiển thị thông báo lỗi sau khi chuyển hướng
+- Hiển thị hướng dẫn hoặc thông tin tạm thời cho người dùng
+
+## Quản lý Form và Bảo mật CSRF
+
+PHPure cung cấp lớp `Form` để hỗ trợ tạo và bảo mật các form HTML. Đặc biệt, lớp này cung cấp các phương thức để tạo token CSRF (Cross-Site Request Forgery) nhằm bảo vệ ứng dụng của bạn khỏi các cuộc tấn công giả mạo yêu cầu.
+
+```php
+// Trong controller, tạo view với form
+public function create()
+{
+    $this->render('users/create');
+}
+
+// Trong view (users/create.html.twig)
+<form method="post" action="{{ url('/users/store') }}">
+    <input type="hidden" name="csrf_token" value="{{ form_token() }}">
+
+    <div class="form-group">
+        <label for="name">Tên:</label>
+        {{ form_input('text', 'name', '', {'class': 'form-control', 'required': 'required'}) }}
+    </div>
+
+    <div class="form-group">
+        <label for="email">Email:</label>
+        {{ form_input('email', 'email', '', {'class': 'form-control', 'required': 'required'}) }}
+    </div>
+
+    <button type="submit" class="btn btn-primary">Đăng ký</button>
+</form>
+
+// Trong controller xử lý form
+public function store()
+{
+    // Kiểm tra token CSRF
+    $token = Request::input('csrf_token');
+    if (!Form::validateToken($token)) {
+        Session::flash('error', 'Token không hợp lệ!');
+        redirect('/users/create');
+        return;
+    }
+
+    // Xử lý dữ liệu form
+    // ...
+}
+```
+
+## Phân trang
+
+Phân trang là một tính năng quan trọng khi hiển thị một lượng lớn dữ liệu. PHPure cung cấp lớp `Pagination` để giúp bạn dễ dàng triển khai phân trang trong ứng dụng của mình:
+
+```php
+// Trong controller
+public function index()
+{
+    $currentPage = (int) Request::query('page', 1);
+    $perPage = 10;
+
+    // Lấy tổng số bản ghi
+    $total = Database::table('users')->count();
+
+    // Khởi tạo đối tượng Pagination
+    $pagination = new Pagination($total, $perPage, $currentPage);
+
+    // Lấy dữ liệu với phân trang
+    $users = Database::table('users')
+                   ->orderBy('id', 'DESC')
+                   ->limit($perPage)
+                   ->offset($pagination->offset())
+                   ->get();
+
+    $this->render('users/index', [
+        'users' => $users,
+        'pagination' => $pagination->links()
+    ]);
+}
+
+// Trong view (users/index.html.twig)
+{# Hiển thị danh sách người dùng #}
+<ul>
+    {% for user in users %}
+        <li>{{ user.name }} - {{ user.email }}</li>
+    {% else %}
+        <li>Không tìm thấy người dùng nào.</li>
+    {% endfor %}
+</ul>
+
+{# Hiển thị phân trang #}
+<nav>
+    <ul class="pagination">
+        {% for link in pagination %}
+            <li class="page-item {{ link.active ? 'active' : '' }}">
+                <a class="page-link" href="{{ link.url }}">{{ link.page }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+</nav>
+```
+
+## Cache
+
+Cache giúp tăng hiệu suất ứng dụng bằng cách lưu trữ dữ liệu tạm thời, tránh phải thực hiện các tác vụ tốn kém như truy vấn cơ sở dữ liệu nhiều lần. PHPure cung cấp lớp `Cache` đơn giản nhưng hiệu quả:
+
+```php
+// Lưu dữ liệu vào cache
+Cache::put('users', $users, 60); // Lưu trữ trong 60 phút
+
+// Lấy dữ liệu từ cache
+$users = Cache::get('users');
+
+// Ví dụ thực tế: Lấy danh sách người dùng từ cache hoặc cơ sở dữ liệu
+public function index()
+{
+    // Thử lấy dữ liệu từ cache
+    $users = Cache::get('users');
+
+    // Nếu không có trong cache, lấy từ cơ sở dữ liệu và lưu vào cache
+    if (!$users) {
+        $users = User::all();
+        Cache::put('users', $users, 30); // Lưu trữ trong 30 phút
+    }
+
+    $this->render('users/index', [
+        'users' => $users
+    ]);
+}
+
+// Xóa cache
+Cache::delete('users');
+
+// Xóa tất cả cache
+Cache::flush();
+```
+
+## Xử lý lỗi nâng cao
+
+PHPure cung cấp lớp `ExceptionHandler` để xử lý lỗi một cách hiệu quả. Lớp này tự động bắt lỗi và ngoại lệ, ghi log chúng và hiển thị thông báo lỗi thích hợp dựa trên môi trường:
+
+```php
+// Đăng ký xử lý ngoại lệ trong file bootstrap
+ExceptionHandler::register();
+
+// Khi xảy ra lỗi:
+// - Trong môi trường phát triển: Hiển thị lỗi chi tiết
+// - Trong môi trường sản xuất: Hiển thị trang lỗi thân thiện với người dùng
+```
+
+Để tạo trang lỗi tùy chỉnh, bạn có thể tạo các file view tương ứng trong thư mục `resources/views/errors/`:
+
+- `404.html.twig` - Không tìm thấy trang
+- `500.html.twig` - Lỗi máy chủ
+
+## Lọc đầu vào an toàn
+
+PHPure mở rộng lớp `Request` với phương thức `sanitize()` để lọc dữ liệu đầu vào, bảo vệ ứng dụng khỏi mã độc:
+
+```php
+// Lấy dữ liệu đầu vào đã được lọc
+$name = Request::sanitize('name');
+$email = Request::sanitize('email');
+
+// Kiểm tra xem request có phải là Ajax không
+if (Request::isAjax()) {
+    // Xử lý Ajax request
+}
+
+// Lấy địa chỉ IP của người dùng
+$userIp = Request::ip();
+```
+
+## Xử lý upload file
+
+PHPure cung cấp lớp `Storage` để quản lý việc upload và lưu trữ file. Dưới đây là một ví dụ hoàn chỉnh về cách xử lý upload file:
+
+```php
+// Trong view (form upload)
+<form method="post" action="{{ url('/upload') }}" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ form_token() }}">
+
+    <div class="form-group">
+        <label for="avatar">Ảnh đại diện:</label>
+        <input type="file" name="avatar" id="avatar">
+    </div>
+
+    <button type="submit" class="btn btn-primary">Tải lên</button>
+</form>
+
+// Trong controller
+public function upload()
+{
+    // Kiểm tra token CSRF
+    $token = Request::input('csrf_token');
+    if (!Form::validateToken($token)) {
+        Session::flash('error', 'Token không hợp lệ!');
+        redirect('/profile');
+        return;
+    }
+
+    // Kiểm tra file đã upload
+    if (!isset($_FILES['avatar']) || $_FILES['avatar']['error'] !== UPLOAD_ERR_OK) {
+        Session::flash('error', 'Lỗi khi tải file lên!');
+        redirect('/profile');
+        return;
+    }
+
+    // Tạo tên file ngẫu nhiên
+    $extension = pathinfo($_FILES['avatar']['name'], PATHINFO_EXTENSION);
+    $filename = uniqid() . '.' . $extension;
+
+    // Lưu file
+    $storagePath = 'avatars/' . $filename;
+    $filepath = Storage::put($storagePath, $_FILES['avatar']);
+
+    // Cập nhật hồ sơ người dùng
+    $userId = Session::get('user_id');
+    User::update(['avatar' => $storagePath], $userId);
+
+    Session::flash('success', 'Tải lên ảnh đại diện thành công!');
+    redirect('/profile');
+}
+```
+
+Với những tính năng này, PHPure cung cấp cho bạn một bộ công cụ toàn diện để xây dựng các ứng dụng web hiện đại một cách hiệu quả.
