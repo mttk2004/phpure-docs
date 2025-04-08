@@ -12,6 +12,8 @@
 
   --color-bg: #edf6f9;
   --color-text: #181f30;
+  --color-muted: #ddd;
+  --color-muted-foreground: #333;
 
   --color-gray-50: #f7f9fb;
   --color-gray-100: #e0e7ef;
@@ -177,6 +179,10 @@
 
   code, pre {
     font-family: 'Cascadia Code', mon;
+  }
+
+  strong {
+    font-weight: 600;
   }
 
   /* Đảm bảo không bị overflow trên thiết bị di động */

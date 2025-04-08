@@ -160,6 +160,7 @@ export default function DocLayout({
                       {section.title}
                     </a>
 
+                    {/* Mục lục con */}
                     {section.items && section.items.length > 0 && (
                       <ul className="space-y-2 ml-4 pt-2">
                         {section.items.map((item, j) => (
