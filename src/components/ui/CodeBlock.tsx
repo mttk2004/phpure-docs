@@ -2,7 +2,7 @@ import { useTheme } from '@/hooks/useTheme';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus, vs } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Copy, Check } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './CodeBlock.module.css';
 
@@ -14,6 +14,7 @@ interface CodeBlockProps {
   isTypingComplete?: boolean;
   skipAnimation?: boolean;
   showCopyButton?: boolean;
+  maxWidth?: string; // Thêm để kiểm soát độ rộng tối đa
 }
 
 export function CodeBlock({
@@ -24,12 +25,14 @@ export function CodeBlock({
   isTypingComplete,
   skipAnimation,
   showCopyButton = true,
+  maxWidth,
 }: CodeBlockProps) {
   const { t } = useTranslation()
   const [copied, setCopied] = useState(false);
   const { theme } = useTheme();
   const [isDarkTheme, setIsDarkTheme] = useState(theme === 'dark');
   const [isMobile, setIsMobile] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Kiểm tra kích thước màn hình
   useEffect(() => {
@@ -73,20 +76,25 @@ export function CodeBlock({
       ...codeStyle['code[class*="language-"]'],
       lineHeight: '1.6',
       fontFamily: "'Cascadia Code', monospace",
-      wordWrap: isMobile ? 'break-word' : 'normal',
+      // Cho phép xuống dòng trên màn hình nhỏ nhưng vẫn giữ indent
       whiteSpace: isMobile ? 'pre-wrap' : 'pre',
+      fontSize: isMobile ? '0.875rem' : '1rem',
+      tabSize: 4,
     },
     'pre[class*="language-"]': {
       ...codeStyle['pre[class*="language-"]'],
       lineHeight: '1.6',
       fontFamily: "'Cascadia Code', monospace",
-      wordWrap: isMobile ? 'break-word' : 'normal',
+      // Cho phép xuống dòng trên màn hình nhỏ nhưng vẫn giữ indent
       whiteSpace: isMobile ? 'pre-wrap' : 'pre',
+      overflow: 'auto',
+      fontSize: isMobile ? '0.875rem' : '1rem',
+      tabSize: 4,
     }
   };
 
   // Sử dụng màu nền phù hợp với theme của trang web
-  const bgColor = isDarkTheme ? 'hsl(222, 47%, 11%)' : 'hsl(0, 0%, 100%)';
+  const bgColor = isDarkTheme ? 'hsl(222, 47%, 11%)' : 'hsl(190, 50%, 98%)';
 
   // Xác định nội dung hiển thị (animated hoặc static)
   const displayContent = animatedCode !== undefined
@@ -94,7 +102,14 @@ export function CodeBlock({
     : code;
 
   return (
-    <div className={`relative font-mono ${styles.codeContainer}`}>
+    <div
+      className={`relative font-mono ${styles.codeContainer}`}
+      ref={containerRef}
+      style={{
+        maxWidth: maxWidth || '100%',
+        overflowX: isMobile ? 'hidden' : 'auto'
+      }}
+    >
       {showCopyButton && (
         <button
           type="button"
@@ -116,14 +131,20 @@ export function CodeBlock({
         </button>
       )}
 
-      <div className="w-full">
+      <div
+        className={`w-full ${isMobile ? styles.mobileContainer : ''}`}
+        style={{
+          maxWidth: '100%',
+          overflowX: isMobile ? 'hidden' : 'auto'
+        }}
+      >
         <SyntaxHighlighter
           language={language}
           style={codeStyle}
           customStyle={{
             margin: 0,
             padding: '1rem',
-            paddingTop: '1.5rem', // Thêm padding phía trên để có chỗ cho nút sao chép
+            paddingTop: '1.5rem',
             borderRadius: 0,
             fontSize: isMobile ? '0.875rem' : '1rem',
             fontFamily: "'Cascadia Code', monospace",
@@ -131,16 +152,33 @@ export function CodeBlock({
             transition: 'all 0.2s ease-in-out',
             lineHeight: '1.6',
             maxWidth: '100%',
-            wordWrap: isMobile ? 'break-word' : 'normal',
+            overflow: isMobile ? 'visible' : 'auto',
             whiteSpace: isMobile ? 'pre-wrap' : 'pre',
+            tabSize: 4,
+            MozTabSize: 4,
+            OTabSize: 4,
+            ...(isMobile && {
+              overflowWrap: 'break-word',
+              wordWrap: 'break-word',
+              wordBreak: 'normal',
+              overflowX: 'hidden'
+            })
           }}
           wrapLines={true}
-          wrapLongLines={isMobile}
+          wrapLongLines={isMobile} // Cho phép ngắt dòng trên thiết bị di động
           lineProps={() => ({
             style: {
               display: 'block',
               lineHeight: '1.6',
-              wordBreak: isMobile ? 'break-all' : 'normal',
+              whiteSpace: isMobile ? 'pre-wrap' : 'pre',
+              tabSize: 4,
+              MozTabSize: 4,
+              OTabSize: 4,
+              ...(isMobile && {
+                overflowWrap: 'break-word',
+                wordWrap: 'break-word',
+                wordBreak: 'normal'
+              })
             },
             className: styles.syntaxLine
           })}
@@ -162,7 +200,15 @@ export function CodeBlock({
               fontSize: isMobile ? '0.875rem' : '1rem',
               fontFamily: "'Cascadia Code', monospace",
               lineHeight: '1.6',
-              wordBreak: isMobile ? 'break-all' : 'normal',
+              whiteSpace: isMobile ? 'pre-wrap' : 'pre',
+              tabSize: 4,
+              MozTabSize: 4,
+              OTabSize: 4,
+              ...(isMobile && {
+                overflowWrap: 'break-word',
+                wordWrap: 'break-word',
+                wordBreak: 'normal'
+              })
             }
           }}
         >

@@ -86,27 +86,143 @@
 @media (max-width: 768px) {
   .codeContainer {
     font-size: 0.875rem !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    position: relative !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
   }
 
   .codeContainer :global(pre) {
-    max-width: 100%;
-    word-wrap: break-word !important;
+    max-width: 100% !important;
     white-space: pre-wrap !important;
+    tab-size: 4 !important;
+    -moz-tab-size: 4 !important;
+    -o-tab-size: 4 !important;
+    overflow-wrap: break-word !important;
+    word-wrap: break-word !important;
+    word-break: normal !important;
+    overflow-x: hidden !important;
   }
 
   .codeContainer :global(code) {
-    word-wrap: break-word !important;
     white-space: pre-wrap !important;
+    tab-size: 4 !important;
+    -moz-tab-size: 4 !important;
+    -o-tab-size: 4 !important;
+    overflow-wrap: break-word !important;
+    word-wrap: break-word !important;
+    word-break: normal !important;
+    overflow-x: hidden !important;
   }
 
   .codeContainer :global(.token) {
-    word-break: break-all !important;
-    white-space: normal !important;
+    white-space: pre-wrap !important;
+    tab-size: 4 !important;
+    -moz-tab-size: 4 !important;
+    -o-tab-size: 4 !important;
+    overflow-wrap: break-word !important;
+    word-wrap: break-word !important;
   }
 
   .syntaxLine {
-    word-wrap: break-word !important;
-    word-break: break-all !important;
     white-space: pre-wrap !important;
+    tab-size: 4 !important;
+    -moz-tab-size: 4 !important;
+    -o-tab-size: 4 !important;
+    display: block !important;
+    width: 100% !important;
+    overflow-wrap: break-word !important;
+    word-wrap: break-word !important;
+    word-break: normal !important;
+    overflow-x: hidden !important;
   }
+
+  .codeContainer :global(.token.punctuation) {
+    white-space: normal !important;
+  }
+
+  .codeContainer :global(.token.punctuation:first-child) {
+    margin-left: 0 !important;
+  }
+
+  .codeContainer :global(pre[class*="language-"]) {
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+}
+
+/* Thêm hỗ trợ cho scroll ngang */
+.codeContainer {
+  overflow-x: auto !important;
+}
+
+.codeContainer :global(pre) {
+  overflow-x: auto !important;
+  tab-size: 4 !important;
+}
+
+/* Tùy chỉnh scrollbar */
+.codeContainer :global(pre)::-webkit-scrollbar,
+.codeContainer::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+
+.codeContainer :global(pre)::-webkit-scrollbar-track,
+.codeContainer::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.codeContainer :global(pre)::-webkit-scrollbar-thumb,
+.codeContainer::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+.codeContainer :global(pre)::-webkit-scrollbar-thumb:hover,
+.codeContainer::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-foreground);
+}
+
+/* Đảm bảo tab size trên tất cả các trình duyệt */
+.codeContainer,
+.codeContainer :global(pre),
+.codeContainer :global(code),
+.syntaxLine {
+  -moz-tab-size: 4 !important;
+  -o-tab-size: 4 !important;
+  tab-size: 4 !important;
+}
+
+/* Đảm bảo tất cả indent được giữ nguyên */
+.codeContainer :global(.token.tab),
+.codeContainer :global(.token.space) {
+  display: inline-block !important;
+  min-width: 1ch !important; /* Đảm bảo khoảng trắng không bị co lại */
+}
+
+.codeContainer :global(.token.tab) {
+  min-width: 4ch !important; /* Đảm bảo tab có đúng kích thước */
+}
+
+/* Đảm bảo khoảng trống đầu dòng không bị mất khi xuống dòng */
+.codeContainer :global(pre[class*="language-"]) {
+  padding-left: 1rem !important;
+}
+
+/* Class đặc biệt cho mobile container */
+.mobileContainer {
+  overflow-x: hidden !important;
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+.mobileContainer :global(pre) {
+  max-width: 100% !important;
+  overflow-x: visible !important;
+}
+
+.mobileContainer :global(code) {
+  max-width: 100% !important;
 }

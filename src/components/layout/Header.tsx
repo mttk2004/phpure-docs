@@ -4,13 +4,15 @@ import { useTheme } from '@/hooks/useTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
-import { GITHUB_REPO_URL, GITHUB_STAR_URL } from '@/utils';
+import { GITHUB_RELEASES_URL, GITHUB_STAR_URL } from '@/utils';
+import { useTranslation } from 'react-i18next';
 interface HeaderProps {
   isSidebarOpen: boolean;
   onMenuClick: () => void;
 }
 
 export default function Header({ isSidebarOpen, onMenuClick }: HeaderProps) {
+  const { t } = useTranslation();
   const { theme, toggleTheme } = useTheme();
   const { toggleLanguage, isVietnamese } = useLanguage();
   const [themeAnimating, setThemeAnimating] = useState(false);
@@ -55,18 +57,18 @@ export default function Header({ isSidebarOpen, onMenuClick }: HeaderProps) {
           <nav className="hidden md:flex items-center gap-4 mr-4">
             <Link
               to="/docs"
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              className="text-sm text-muted-foreground hover:text-primary transition-colors"
               activeProps={{ className: "text-primary font-medium" }}
             >
-              Tài liệu
+              {t('navigation.documentation')}
             </Link>
             <a
-              href={GITHUB_REPO_URL}
+              href={GITHUB_RELEASES_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              className="text-sm text-muted-foreground hover:text-primary transition-colors"
             >
-              GitHub
+              {t('navigation.releases')}
             </a>
           </nav>
 
@@ -80,7 +82,7 @@ export default function Header({ isSidebarOpen, onMenuClick }: HeaderProps) {
             <Languages
               className={`h-4 w-4 transition-all ${langAnimating ? 'rotate-180' : 'rotate-0'}`}
             />
-            <span className="sr-only">Chuyển đổi ngôn ngữ</span>
+            <span className="sr-only">{t('navigation.toggleLanguage')}</span>
           </Button>
 
           <Button
@@ -96,7 +98,7 @@ export default function Header({ isSidebarOpen, onMenuClick }: HeaderProps) {
             <Moon
               className={`absolute h-4 w-4 transition-transform duration-300 ${theme === 'dark' ? 'rotate-90 scale-0' : 'rotate-0 scale-100'}`}
             />
-            <span className="sr-only">Chuyển đổi giao diện</span>
+            <span className="sr-only">{t('navigation.toggleTheme')}</span>
           </Button>
 
           <a
@@ -107,7 +109,7 @@ export default function Header({ isSidebarOpen, onMenuClick }: HeaderProps) {
           >
             <Button variant="outline" size="sm" className="gap-2 cursor-pointer">
               <Github size={16} />
-              <span>Star on GitHub</span>
+              <span>{t('navigation.starOnGitHub')}</span>
             </Button>
           </a>
         </div>

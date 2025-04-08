@@ -15,20 +15,17 @@
     "features": "Tính năng"
   },
   "navigation": {
-    "introduction": "Giới thiệu",
-    "gettingStarted": "Bắt đầu",
-    "directoryStructure": "Cấu trúc thư mục",
-    "coreConcepts": "Khái niệm cốt lõi",
-    "features": "Tính năng",
-    "buildingApplications": "Xây dựng ứng dụng",
-    "advancedTechniques": "Kỹ thuật nâng cao",
-    "api": "Tham khảo API"
+    "documentation": "Tài liệu",
+    "starOnGitHub": "Star trên GitHub",
+    "releases": "Các bản phát hành",
+    "toggleLanguage": "Chuyển đổi ngôn ngữ",
+    "toggleTheme": "Chuyển đổi giao diện"
   },
   "docs": {
     "previous": "Trước",
     "next": "Tiếp",
     "editOnGitHub": "Chỉnh sửa trang này trên GitHub",
-    "onThisPage": "Trong trang này"
+    "onThisPage": "Trên trang này"
   },
   "others": {
     "copyCode": "Sao chép",

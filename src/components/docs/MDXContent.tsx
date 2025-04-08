@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { CodeBlock } from '@/components/ui/CodeBlock';
 
 interface MDXContentProps {
   children: React.ReactNode;
@@ -77,12 +78,77 @@ export const MDXComponents = {
   blockquote: ({ className, ...props }: React.HTMLAttributes<HTMLQuoteElement>) => (
     <blockquote className={cn("mt-6 border-l-4 border-primary/50 bg-muted py-2 px-6 rounded-r-md", className)} {...props} />
   ),
-  code: ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => (
-    <code className={cn("relative rounded-md bg-muted px-1.5 py-0.5 font-mono text-sm", className)} {...props} />
-  ),
-  pre: ({ className, ...props }: React.HTMLAttributes<HTMLPreElement>) => (
-    <pre className={cn("mt-6 overflow-x-auto rounded-lg border border-border bg-muted p-4", className)} {...props} />
-  ),
+  code: ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => {
+    const content = props.children?.toString() || '';
+
+    // Trích xuất thông tin ngôn ngữ từ className
+    const classNameStr = className || '';
+    const languageMatch = classNameStr.match(/language-(\w+)/);
+    const language = languageMatch ? languageMatch[1] : 'text';
+
+    // Kiểm tra xem code có phải là inline hay không
+    const isInlineCode = !content.includes('\n') && content.length < 100;
+
+    // Nếu là inline code và không có ngôn ngữ được chỉ định (hoặc là text), sử dụng giao diện đơn giản
+    if (isInlineCode && (!languageMatch || language === 'text')) {
+      return (
+        <code className={cn("relative rounded-md bg-muted px-1.5 py-0.5 font-mono text-sm", classNameStr)} {...props} />
+      );
+    }
+
+    // Sử dụng CodeBlock cho cả inline code có chỉ định ngôn ngữ và code blocks
+    return (
+      <CodeBlock
+        code={content}
+        language={language}
+        showLineNumbers={!isInlineCode} // Chỉ hiển thị số dòng cho code blocks
+        showCopyButton={!isInlineCode}  // Chỉ hiển thị nút copy cho code blocks
+      />
+    );
+  },
+  pre: ({ className, ...props }: React.HTMLAttributes<HTMLPreElement>) => {
+    // Xử lý đặc biệt cho pre>code
+    const codeElement = React.Children.toArray(props.children).find(
+      child => React.isValidElement(child) && child.type === 'code'
+    ) as React.ReactElement<{ className?: string; children?: React.ReactNode }> | undefined;
+
+    if (codeElement) {
+      const code = codeElement.props.children?.toString() || '';
+      // Lấy language từ className, thường có định dạng "language-xxx"
+      const classNameStr = codeElement.props.className || '';
+      const match = classNameStr.match(/language-(\w+)/);
+      const language = match ? match[1] : 'text';
+
+      // Nếu ngôn ngữ không được xác định, cố gắng dự đoán từ nội dung
+      let detectedLanguage = language;
+      if (detectedLanguage === 'text') {
+        // Thử dự đoán ngôn ngữ từ nội dung
+        if (code.includes('<?php') || code.includes('namespace ') || code.includes('use ')) {
+          detectedLanguage = 'php';
+        } else if (code.includes('function') && code.includes('=>')) {
+          detectedLanguage = 'js';
+        } else if (code.includes('import ') && code.includes('from ')) {
+          detectedLanguage = 'jsx';
+        } else if (code.includes('<template>') || code.includes('export default {')) {
+          detectedLanguage = 'vue';
+        } else if (code.includes('class ') && code.includes('extends ')) {
+          detectedLanguage = 'typescript';
+        }
+      }
+
+      return (
+        <CodeBlock
+          code={code}
+          language={detectedLanguage}
+          showLineNumbers={true}
+          showCopyButton={true}
+        />
+      );
+    }
+
+    // Fallback nếu không phải pre>code
+    return <pre className={cn("mt-6 overflow-x-auto rounded-lg border border-border bg-muted p-0", className)} {...props} />;
+  },
   table: ({ className, ...props }: React.HTMLAttributes<HTMLTableElement>) => (
     <div className="my-6 w-full overflow-y-auto">
       <table className={cn("w-full", className)} {...props} />

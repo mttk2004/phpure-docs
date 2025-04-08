@@ -3,7 +3,7 @@ import { Link } from '@tanstack/react-router';
 import { ArrowRight, Github, Package, Zap, Code, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CodeBlock } from '@/components/ui/CodeBlock';
-import { GITHUB_REPO_URL } from '@/utils';
+import { GITHUB_REPO_URL, GITHUB_STAR_URL } from '@/utils';
 
 // Mã PHP mẫu
 const phpCodeExample = `<?php
@@ -250,7 +250,7 @@ export default function HomePage() {
                 </Button>
               </Link>
               <a
-                href={GITHUB_REPO_URL}
+                href={GITHUB_STAR_URL}
                 target="_blank"
                 rel="noopener noreferrer"
               >

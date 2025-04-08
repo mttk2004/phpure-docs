@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from '@tanstack/react-router';
 import { ArrowLeft, ArrowRight, Edit, ChevronRight } from 'lucide-react';
 import { GITHUB_REPO_URL } from '@/utils';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 
 interface DocNavItem {
   title: string;
@@ -37,8 +38,19 @@ export default function DocLayout({
 }: DocLayoutProps) {
   const { t } = useTranslation();
 
+  // Sử dụng useEffect để cập nhật tiêu đề trang trực tiếp
+  useEffect(() => {
+    document.title = `PHPure Documentation - ${title}`;
+  }, [title]);
+
   return (
     <div className="relative w-full max-w-5xl mx-auto">
+      {/* SEO Meta Tags */}
+      <Helmet>
+        <title>PHPure Documentation - {title}</title>
+        {description && <meta name="description" content={description} />}
+      </Helmet>
+
       {/* Đường dẫn */}
       <div className="flex items-center text-sm text-muted-foreground mb-6">
         <Link to="/docs" className="hover:text-foreground transition-colors">
@@ -48,13 +60,7 @@ export default function DocLayout({
         <span className="font-medium text-foreground">{title}</span>
       </div>
 
-      {/* Tiêu đề và mô tả */}
-      <div className="space-y-4 mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">{title}</h1>
-        {description && <p className="text-lg text-muted-foreground leading-relaxed">{description}</p>}
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_250px] gap-12">
+      <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_200px] gap-12">
         {/* Phần nội dung chính */}
         <div className="min-w-0">
           <div className="prose prose-zinc dark:prose-invert max-w-none">
@@ -110,15 +116,15 @@ export default function DocLayout({
 
         {/* Mục lục */}
         {toc && toc.length > 0 && (
-          <div className="hidden md:block">
-            <div className="sticky top-24">
-              <h3 className="text-sm font-semibold mb-4">{t('docs.onThisPage')}</h3>
+          <div className="hidden md:block relative">
+            <div className="fixed w-[200px] top-24 max-h-[calc(100vh-6rem)] overflow-auto pr-2">
+              <h3 className="text-xs font-semibold uppercase mb-4">{t('docs.onThisPage')}</h3>
               <ul className="space-y-4 text-sm">
                 {toc.map((section, i) => (
                   <li key={i} className="space-y-2">
                     <a
                       href={section.url}
-                      className="text-muted-foreground hover:text-foreground transition-colors"
+                      className="block text-muted-foreground hover:text-foreground transition-colors"
                     >
                       {section.title}
                     </a>
@@ -129,7 +135,7 @@ export default function DocLayout({
                           <li key={j}>
                             <a
                               href={item.url}
-                              className="text-muted-foreground hover:text-foreground transition-colors"
+                              className="block text-muted-foreground hover:text-foreground transition-colors text-xs"
                             >
                               {item.title}
                             </a>

@@ -15,14 +15,11 @@
     "features": "Features"
   },
   "navigation": {
-    "introduction": "Introduction",
-    "gettingStarted": "Getting Started",
-    "directoryStructure": "Directory Structure",
-    "coreConcepts": "Core Concepts",
-    "features": "Features",
-    "buildingApplications": "Building Applications",
-    "advancedTechniques": "Advanced Techniques",
-    "api": "API Reference"
+    "documentation": "Documentation",
+    "starOnGitHub": "Star on GitHub",
+    "releases": "Releases",
+    "toggleLanguage": "Toggle Language",
+    "toggleTheme": "Toggle Theme"
   },
   "docs": {
     "previous": "Previous",

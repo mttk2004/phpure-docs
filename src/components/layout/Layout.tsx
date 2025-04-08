@@ -52,17 +52,17 @@ export default function Layout({ children }: LayoutProps) {
         <Sidebar isOpen={isSidebarOpen} />
 
         <main className="flex-1 lg:pl-72 transition-all duration-300 ease-in-out">
-          <div className="container mx-auto px-2 py-4 sm:p-4  md:p-8">
+          <div className="container mx-auto p-4 sm:p-6 md:p-8">
             {children}
           </div>
 
-          <footer className="border-t border-border py-8 mt-12 md:mt-16">
+          <footer className="border-t border-border px-4 py-6 sm:p-6 md:p-8 mt-12 md:mt-16">
             <div className="container mx-auto px-2 sm:px-4 md:px-6">
               <div className="flex flex-col sm:flex-row justify-between items-center text-sm text-muted-foreground">
                 <p>© {new Date().getFullYear()} PHPure. All rights reserved.</p>
                 <div className="flex items-center gap-4 mt-4 sm:mt-0">
                   <p>
-                    Made with ❤️ by <a href="https://github.com/mttk2004" target="_blank" rel="noopener noreferrer">Mai Tran Tuan Kiet</a>
+                    Made with ❤️ by <a href="https://github.com/mttk2004" target="_blank" rel="noopener noreferrer">Mai Trần Tuấn Kiệt</a>
                   </p>
                 </div>
               </div>
