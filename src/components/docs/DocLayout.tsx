@@ -1,9 +1,8 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Link } from '@tanstack/react-router';
 import { ArrowLeft, ArrowRight, Edit, ChevronRight } from 'lucide-react';
 import { GITHUB_REPO_URL } from '@/utils';
 import { useTranslation } from 'react-i18next';
-import { Helmet } from 'react-helmet-async';
 
 interface DocNavItem {
   title: string;
@@ -38,18 +37,13 @@ export default function DocLayout({
 }: DocLayoutProps) {
   const { t } = useTranslation();
 
-  // Sử dụng useEffect để cập nhật tiêu đề trang trực tiếp
-  useEffect(() => {
-    document.title = `PHPure Documentation - ${title}`;
-  }, [title]);
+  // Không cần useEffect để cập nhật tiêu đề nữa vì React 19 sẽ tự động xử lý
 
   return (
     <div className="relative w-full max-w-5xl mx-auto">
-      {/* SEO Meta Tags */}
-      <Helmet>
-        <title>PHPure Documentation - {title}</title>
-        {description && <meta name="description" content={description} />}
-      </Helmet>
+      {/* SEO Meta Tags - Sử dụng tính năng mới của React 19 */}
+      <title>PHPure Documentation - {title}</title>
+      {description && <meta name="description" content={description} />}
 
       {/* Đường dẫn */}
       <div className="flex items-center text-sm text-muted-foreground mb-6">
