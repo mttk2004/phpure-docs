@@ -1,4 +1,4 @@
-import { useEffect, useState, ComponentType } from 'react';
+import { useEffect, useState, ComponentType, useRef } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { MDXContent } from './MDXContent';
 
@@ -12,11 +12,32 @@ export function DynamicMDX({ contentKey }: DynamicMDXProps) {
   const [error, setError] = useState<string | null>(null);
   const [fallbackLanguage, setFallbackLanguage] = useState<string | null>(null);
   const [ContentComponent, setContentComponent] = useState<ComponentType | null>(null);
+  const contentRendered = useRef(false);
+
+  // Kích hoạt sự kiện content-rendered khi component đã được render
+  useEffect(() => {
+    if (ContentComponent && !contentRendered.current) {
+      contentRendered.current = true;
+
+      // Đợi một chút để đảm bảo DOM đã được render
+      setTimeout(() => {
+        // Tạo và phát sự kiện content-rendered
+        const event = new Event('content-rendered');
+        window.dispatchEvent(event);
+      }, 200);
+    }
+
+    // Reset khi contentKey hoặc language thay đổi
+    return () => {
+      contentRendered.current = false;
+    };
+  }, [ContentComponent, language, contentKey]);
 
   useEffect(() => {
     async function loadMDXContent() {
       setIsLoading(true);
       setError(null);
+      contentRendered.current = false;
 
       try {
         // Thử tải nội dung với ngôn ngữ hiện tại

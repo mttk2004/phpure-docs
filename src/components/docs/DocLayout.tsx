@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from '@tanstack/react-router';
 import { ArrowLeft, ArrowRight, Edit, ChevronRight } from 'lucide-react';
 import { GITHUB_REPO_URL } from '@/utils';
@@ -37,7 +37,33 @@ export default function DocLayout({
 }: DocLayoutProps) {
   const { t } = useTranslation();
 
-  // Không cần useEffect để cập nhật tiêu đề nữa vì React 19 sẽ tự động xử lý
+  // Xử lý hash trong URL để cuộn đến vị trí tương ứng sau khi trang được tải
+  useEffect(() => {
+    const handleScrollToHash = () => {
+      const hash = window.location.hash;
+      if (hash) {
+        const id = hash.replace('#', '');
+        const element = document.getElementById(id);
+        if (element) {
+          // Đợi một chút để nội dung render hoàn tất
+          setTimeout(() => {
+            element.scrollIntoView({ behavior: 'smooth' });
+          }, 300);
+        }
+      }
+    };
+
+    // Xử lý khi trang vừa tải xong
+    handleScrollToHash();
+
+    // Thêm event listener để xử lý khi URL thay đổi (khi người dùng nhấn back/forward)
+    window.addEventListener('hashchange', handleScrollToHash);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('hashchange', handleScrollToHash);
+    };
+  }, []);
 
   return (
     <div className="relative w-full max-w-5xl mx-auto">
@@ -118,6 +144,17 @@ export default function DocLayout({
                   <li key={i} className="space-y-2">
                     <a
                       href={section.url}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        const targetId = section.url.replace('#', '');
+                        const targetElement = document.getElementById(targetId);
+                        if (targetElement) {
+                          // Thêm id vào URL
+                          window.history.pushState({}, '', section.url);
+                          // Cuộn mượt đến vị trí
+                          targetElement.scrollIntoView({ behavior: 'smooth' });
+                        }
+                      }}
                       className="block text-muted-foreground hover:text-foreground transition-colors"
                     >
                       {section.title}
@@ -129,6 +166,17 @@ export default function DocLayout({
                           <li key={j}>
                             <a
                               href={item.url}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                const targetId = item.url.replace('#', '');
+                                const targetElement = document.getElementById(targetId);
+                                if (targetElement) {
+                                  // Thêm id vào URL
+                                  window.history.pushState({}, '', item.url);
+                                  // Cuộn mượt đến vị trí
+                                  targetElement.scrollIntoView({ behavior: 'smooth' });
+                                }
+                              }}
                               className="block text-muted-foreground hover:text-foreground transition-colors text-xs"
                             >
                               {item.title}

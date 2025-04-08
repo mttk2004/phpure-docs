@@ -1,46 +1,11 @@
-import { useEffect, useState } from 'react';
 import DocLayout from '@/components/docs/DocLayout';
 import { useMDXMeta } from '@/components/docs/MDXProvider';
 import DynamicMDX from '@/components/docs/DynamicMDX';
-
-interface TocItem {
-  title: string;
-  url: string;
-  items?: TocItem[];
-}
+import { useToc } from '@/hooks';
 
 export default function CoreConcepts() {
-  const [toc, setToc] = useState<TocItem[]>([]);
   const meta = useMDXMeta('core-concepts');
-
-  useEffect(() => {
-    setToc([
-      {
-        title: "Mô hình MVC",
-        url: "#mo-hinh-mvc"
-      },
-      {
-        title: "Routing",
-        url: "#routing"
-      },
-      {
-        title: "Controllers",
-        url: "#controllers"
-      },
-      {
-        title: "Models",
-        url: "#models"
-      },
-      {
-        title: "Views",
-        url: "#views"
-      },
-      {
-        title: "Middleware",
-        url: "#middleware"
-      }
-    ]);
-  }, []);
+  const { toc } = useToc('core-concepts');
 
   const prev = {
     title: "Bắt đầu",

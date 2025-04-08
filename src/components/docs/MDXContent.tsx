@@ -51,18 +51,70 @@ export function MDXContent({ children, className }: MDXContentProps) {
 
 // Các components tái sử dụng cho MDX
 export const MDXComponents = {
-  h1: ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
-    <h1 className={cn("mt-2 scroll-m-20 text-3xl font-bold tracking-tight", className)} {...props} />
-  ),
-  h2: ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
-    <h2 className={cn("mt-10 scroll-m-20 text-2xl font-semibold tracking-tight border-b pb-2 border-border", className)} {...props} />
-  ),
-  h3: ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
-    <h3 className={cn("mt-8 scroll-m-20 text-xl font-semibold tracking-tight", className)} {...props} />
-  ),
-  h4: ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
-    <h4 className={cn("mt-8 scroll-m-20 text-lg font-semibold tracking-tight", className)} {...props} />
-  ),
+  h1: ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => {
+    const id = props.children?.toString()
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[đĐ]/g, 'd')
+      .replace(/\s+/g, '-')
+      .replace(/[^\w-]+/g, '')
+      .replace(/--+/g, '-')
+      .replace(/^-+/, '')
+      .replace(/-+$/, '');
+
+    return (
+      <h1 id={id} className={cn("mt-2 scroll-m-20 text-3xl font-bold tracking-tight", className)} {...props} />
+    );
+  },
+  h2: ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => {
+    const id = props.children?.toString()
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[đĐ]/g, 'd')
+      .replace(/\s+/g, '-')
+      .replace(/[^\w-]+/g, '')
+      .replace(/--+/g, '-')
+      .replace(/^-+/, '')
+      .replace(/-+$/, '');
+
+    return (
+      <h2 id={id} className={cn("mt-10 scroll-m-20 text-2xl font-semibold tracking-tight border-b pb-2 border-border", className)} {...props} />
+    );
+  },
+  h3: ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => {
+    const id = props.children?.toString()
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[đĐ]/g, 'd')
+      .replace(/\s+/g, '-')
+      .replace(/[^\w-]+/g, '')
+      .replace(/--+/g, '-')
+      .replace(/^-+/, '')
+      .replace(/-+$/, '');
+
+    return (
+      <h3 id={id} className={cn("mt-8 scroll-m-20 text-xl font-semibold tracking-tight", className)} {...props} />
+    );
+  },
+  h4: ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => {
+    const id = props.children?.toString()
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[đĐ]/g, 'd')
+      .replace(/\s+/g, '-')
+      .replace(/[^\w-]+/g, '')
+      .replace(/--+/g, '-')
+      .replace(/^-+/, '')
+      .replace(/-+$/, '');
+
+    return (
+      <h4 id={id} className={cn("mt-8 scroll-m-20 text-lg font-semibold tracking-tight", className)} {...props} />
+    );
+  },
   p: ({ className, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
     <p className={cn("leading-7 [&:not(:first-child)]:mt-6", className)} {...props} />
   ),
