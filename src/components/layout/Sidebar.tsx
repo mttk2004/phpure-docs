@@ -155,7 +155,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
         isOpen ? 'translate-x-0' : '-translate-x-full'
       )}
     >
-      <nav className="p-4 space-y-4">
+      <nav className="p-4 space-y-2">
         {navItems.map((section, i) => {
           // Kiểm tra nếu đây là menu có con và có mục con đang active
           const isActive = section.href === currentPath;
@@ -165,7 +165,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
           const isOpen = isSectionOpen(i, section);
 
           return (
-            <div key={i} className="space-y-2">
+            <div key={i} className="space-y-1">
               {section.href ? (
                 <Link
                   to={section.href}
@@ -181,7 +181,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
                     {sectionTitle}
                     {section.isNew && (
                       <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-primary/20 text-primary ml-auto translate-x-1">
-                        Mới
+                        {language === 'vi' ? 'Mới' : 'New'}
                       </span>
                     )}
                   </span>
@@ -201,7 +201,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
                     {sectionTitle}
                     {section.isNew && (
                       <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-primary/20 text-primary ml-auto -translate-x-1">
-                        Mới
+                        {language === 'vi' ? 'Mới' : 'New'}
                       </span>
                     )}
                   </span>
@@ -245,7 +245,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
                                 <span className={isItemActive ? "underline underline-offset-4" : ""}>{itemTitle}</span>
                                 {item.isNew && (
                                   <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-primary/20 text-primary no-underline">
-                                    Mới
+                                    {language === 'vi' ? 'Mới' : 'New'}
                                   </span>
                                 )}
                               </div>

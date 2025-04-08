@@ -12,8 +12,6 @@
 
   --color-bg: #edf6f9;
   --color-text: #181f30;
-  --color-muted: #ddd;
-  --color-muted-foreground: #333;
 
   --color-gray-50: #f7f9fb;
   --color-gray-100: #e0e7ef;
@@ -44,6 +42,8 @@
     /* Base */
     --background: var(--color-bg);
     --foreground: var(--color-text);
+    --color-muted: var(--color-gray-200);
+    --color-muted-foreground: var(--color-gray-700);
 
     /* Card */
     --card: var(--color-bg);
@@ -61,11 +61,11 @@
 
     /* Primary */
     --primary: var(--color-primary);
-    --primary-foreground: var(--color-white);
+    --primary-foreground: var(--color-dark);
 
     /* Secondary */
     --secondary: var(--color-secondary);
-    --secondary-foreground: var(--color-white);
+    --secondary-foreground: var(--color-dark);
 
     /* Muted */
     --muted: var(--color-gray-700);
@@ -73,7 +73,7 @@
 
     /* Accent */
     --accent: var(--color-accent);
-    --accent-foreground: var(--color-white);
+    --accent-foreground: var(--color-black);
 
     /* Destructive */
     --destructive: var(--color-error);
@@ -101,6 +101,8 @@
     /* Base */
     --background: var(--color-text);
     --foreground: var(--color-bg);
+    --color-muted: var(--color-gray-700);
+    --color-muted-foreground: var(--color-gray-200);
 
     /* Card */
     --card: var(--color-text);
@@ -211,6 +213,27 @@
 }
 
 @layer utilities {
+  /* Base */
+  .badge {
+    padding: 0.15rem 0.5rem;
+    border-radius: 0.15rem;
+  }
+
+  .badge--primary {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+  }
+
+  .badge--secondary {
+    background-color: var(--secondary);
+    color: var(--secondary-foreground);
+  }
+
+  .badge--accent {
+    background-color: var(--accent);
+    color: var(--accent-foreground);
+  }
+
   /* Gradient text */
   .text-gradient {
     background-clip: text;
@@ -219,12 +242,20 @@
     background-image: linear-gradient(to right, var(--primary), var(--accent));
   }
 
-  .text-gradient-primary {
-    background-image: linear-gradient(to right, var(--primary), var(--accent));
-  }
+  .box-gradient {
+    display: inline-block;
+    background-image: linear-gradient(45deg, var(--primary), var(--accent));
+    padding: 0.2rem 0.5rem 0.35rem;
+    border-radius: 0.15rem;
+    position: relative;
+    transform: rotate(-3deg) translateY(0.2rem);
+    transform-origin: left center;
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
 
-  .text-gradient-secondary {
-    background-image: linear-gradient(to right, var(--secondary), var(--primary));
+    span {
+      display: inline-block;
+      transform: rotate(3deg) translateY(0.25rem);
+    }
   }
 
   /* Shadows */

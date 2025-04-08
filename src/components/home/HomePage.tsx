@@ -104,7 +104,7 @@ export default function HomePage() {
         <div className="container px-4 mx-auto">
           <div className="max-w-3xl mx-auto mb-10 text-center">
             <div className="inline-flex items-center justify-center px-3 py-1 mb-6 text-sm rounded-full bg-muted">
-              <span className="text-muted-foreground">PHPure v1.0 ra mắt</span>
+              <span className="badge badge--accent">PHPure v1.0 ra mắt</span>
               <div className="w-1 h-1 mx-2 bg-primary rounded-full"></div>
               <a
                 href={`${GITHUB_REPO_URL}/releases`}
@@ -117,8 +117,8 @@ export default function HomePage() {
             </div>
 
             <h1 className="mb-6 text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl">
-              Framework PHP <span className="text-gradient-primary">nhẹ nhàng</span> và{" "}
-              <span className="text-gradient-primary">mạnh mẽ</span>
+              Framework PHP <span className="box-gradient"><span>nhẹ nhàng</span></span> và{" "}
+              <span className="box-gradient"><span>mạnh mẽ</span></span>
             </h1>
 
             <p className="max-w-2xl mx-auto text-lg text-muted-foreground md:text-xl">
@@ -151,7 +151,7 @@ export default function HomePage() {
                 <div className="w-3 h-3 rounded-full bg-red-500"></div>
                 <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
                 <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                <div className="ml-2 text-sm font-medium text-muted-foreground font-script">example.php</div>
+                <div className="ml-2 text-sm font-medium text-muted-foreground font-script">ExampleController.php</div>
               </div>
 
               <div className="relative font-mono w-full overflow-hidden">
@@ -190,7 +190,7 @@ export default function HomePage() {
         <div className="container px-4 mx-auto">
           <div className="max-w-3xl mx-auto mb-16 text-center">
             <h2 className="mb-4 text-3xl font-bold tracking-tight md:text-4xl">
-              Thiết kế cho <span className="text-gradient-primary">hiệu suất</span>
+              Thiết kế cho <span className="box-gradient"><span>hiệu suất</span></span>
             </h2>
             <p className="max-w-2xl mx-auto text-muted-foreground">
               PHPure tập trung vào trải nghiệm phát triển tuyệt vời với các công cụ hiện đại mà không hy sinh hiệu suất.

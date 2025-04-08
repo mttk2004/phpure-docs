@@ -33,11 +33,11 @@ const buttonThemeStyles = `
 }
 
 .button-outline {
-  border: 1px solid var(--color-gray-200);
+  border: 1px solid var(--color-gray-300);
   background-color: var(--color-bg);
 }
 .dark .button-outline {
-  border-color: var(--color-white);
+  border-color: var(--color-gray-600);
   background-color: var(--color-text);
 }
 .button-outline:hover {
@@ -63,11 +63,11 @@ const buttonThemeStyles = `
 }
 
 .button-ghost:hover {
-  background-color: var(--color-accent);
+  background-color: var(--color-primary);
   color: var(--color-white);
 }
 .dark .button-ghost:hover {
-  background-color: var(--color-accent-dark);
+  background-color: var(--color-primary-dark);
 }
 
 .button-link {
