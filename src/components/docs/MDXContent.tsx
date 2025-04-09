@@ -145,7 +145,7 @@ export const MDXComponents = {
     // Nếu là inline code và không có ngôn ngữ được chỉ định (hoặc là text), sử dụng giao diện đơn giản
     if (isInlineCode && (!languageMatch || language === 'text')) {
       return (
-        <code className={cn("relative rounded-md bg-muted px-1.5 py-0.5 font-mono text-sm", classNameStr)} {...props} />
+        <code className={cn("relative rounded-sm muted px-1.5 py-0.5 font-mono text-sm", classNameStr)} {...props} />
       );
     }
 

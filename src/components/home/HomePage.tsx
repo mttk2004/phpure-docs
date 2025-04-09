@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { CodeBlock } from '@/components/ui/CodeBlock';
 import { GITHUB_REPO_URL, GITHUB_STAR_URL } from '@/utils';
 
-// Mã PHP mẫu
+
 const phpCodeExample = `<?php
 
 namespace App\\Controllers;
@@ -23,57 +23,21 @@ class HomeController extends Controller
     }
 }`;
 
-// Mã PHP mẫu ngắn hơn cho thiết bị di động
-const phpCodeExampleMobile = `<?php
-namespace App\\Controllers;
-use Core\\Controller;
-
-class HomeController extends Controller
-{
-    public function index(): void
-    {
-        $this->render('home', [
-          'title' => 'Home',
-          'message' => 'Welcome!',
-        ]);
-    }
-}`;
-
 export default function HomePage() {
   // State cho hiệu ứng typing
   const [displayCode, setDisplayCode] = useState('');
   const [typingComplete, setTypingComplete] = useState(false);
   const [skipAnimation, setSkipAnimation] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-
-  // Kiểm tra kích thước màn hình
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    // Kiểm tra khi component mount
-    checkMobile();
-
-    // Thêm event listener để kiểm tra khi thay đổi kích thước màn hình
-    window.addEventListener('resize', checkMobile);
-
-    // Cleanup
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  // Xác định mã code sẽ sử dụng dựa trên thiết bị
-  const activeCodeExample = isMobile ? phpCodeExampleMobile : phpCodeExample;
 
   // Hiệu ứng typing với tốc độ tối ưu hơn
   useEffect(() => {
     if (skipAnimation) {
-      setDisplayCode(activeCodeExample);
+      setDisplayCode(phpCodeExample);
       setTypingComplete(true);
       return;
     }
 
-    if (displayCode.length < activeCodeExample.length) {
+    if (displayCode.length < phpCodeExample.length) {
       const timeout = setTimeout(() => {
         // Tăng tốc độ typing theo thời gian
         const charsToAdd = Math.min(
@@ -82,15 +46,15 @@ export default function HomePage() {
         );
         const newLength = Math.min(
           displayCode.length + charsToAdd,
-          activeCodeExample.length
+          phpCodeExample.length
         );
-        setDisplayCode(activeCodeExample.slice(0, newLength));
+        setDisplayCode(phpCodeExample.slice(0, newLength));
       }, 10);
       return () => clearTimeout(timeout);
     } else {
       setTypingComplete(true);
     }
-  }, [displayCode, skipAnimation, activeCodeExample]);
+  }, [displayCode, skipAnimation]);
 
   // Hàm xử lý skip animation
   const handleSkipAnimation = () => {
@@ -101,10 +65,9 @@ export default function HomePage() {
     <div className="flex flex-col min-h-screen">
       {/* Hero section */}
       <section className="w-full pt-8 md:pt-12 pb-20 border-b border-border">
-        <div className="container px-4 mx-auto">
           <div className="max-w-3xl mx-auto mb-10 text-center">
             <div className="inline-flex items-center justify-center px-3 py-1 mb-6 text-sm rounded-full bg-muted">
-              <span className="badge badge--accent">PHPure v1.0 ra mắt</span>
+              <span className="badge badge--accent font-medium">PHPure v0.0.3 ra mắt</span>
               <div className="w-1 h-1 mx-2 bg-primary rounded-full"></div>
               <a
                 href={`${GITHUB_REPO_URL}/releases`}
@@ -148,10 +111,10 @@ export default function HomePage() {
           <div className="relative mx-auto overflow-hidden border rounded-lg shadow-lg border-border bg-glassmorphism backdrop-blur-sm max-w-4xl">
             <div className="relative bg-muted overflow-hidden">
               <div className="flex items-center justify-start p-2 space-x-1.5 bg-background/80 border-b border-border">
-                <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                <div className="ml-2 text-sm font-medium text-muted-foreground font-script">ExampleController.php</div>
+                <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-red-500"></div>
+                <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-yellow-500"></div>
+                <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-green-500"></div>
+                <div className="ml-2 text-xs md:text-sm font-medium text-muted-foreground font-script">ExampleController.php</div>
               </div>
 
               <div className="relative font-mono w-full overflow-hidden">
@@ -168,26 +131,25 @@ export default function HomePage() {
                   )}
                 </div>
 
-                <div className="w-full">
+                <div className="w-[90vw] min-[380px]:w-[92vw] min-[450px]:w-[93vw] min-[520px]:w-[94vw]">
                   <CodeBlock
-                    code={activeCodeExample}
+                    code={phpCodeExample}
                     language="php"
-                    showLineNumbers={true}
+                    showLineNumbers={false}
                     animatedCode={displayCode}
                     isTypingComplete={typingComplete}
                     skipAnimation={skipAnimation}
-                    showCopyButton={true}
+                    showCopyButton={false}
+                    paddingTop='1rem'
                   />
                 </div>
               </div>
             </div>
           </div>
-        </div>
       </section>
 
       {/* Features section */}
       <section className="w-full py-20">
-        <div className="container px-4 mx-auto">
           <div className="max-w-3xl mx-auto mb-16 text-center">
             <h2 className="mb-4 text-3xl font-bold tracking-tight md:text-4xl">
               Thiết kế cho <span className="box-gradient"><span>hiệu suất</span></span>
@@ -228,12 +190,10 @@ export default function HomePage() {
               </p>
             </div>
           </div>
-        </div>
       </section>
 
       {/* CTA section */}
       <section className="w-full py-16 md:py-24 bg-muted">
-        <div className="container px-4 mx-auto">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="mb-6 text-3xl font-bold tracking-tight md:text-4xl">
               Sẵn sàng để bắt đầu với PHPure?
@@ -261,7 +221,6 @@ export default function HomePage() {
               </a>
             </div>
           </div>
-        </div>
       </section>
     </div>
   );

@@ -42,8 +42,6 @@
     /* Base */
     --background: var(--color-bg);
     --foreground: var(--color-text);
-    --color-muted: var(--color-gray-200);
-    --color-muted-foreground: var(--color-gray-700);
 
     /* Card */
     --card: var(--color-bg);
@@ -68,8 +66,8 @@
     --secondary-foreground: var(--color-dark);
 
     /* Muted */
-    --muted: var(--color-gray-700);
-    --muted-foreground: var(--color-gray-100);
+    --muted: var(--color-gray-200);
+    --muted-foreground: var(--color-gray-700);
 
     /* Accent */
     --accent: var(--color-accent);
@@ -101,8 +99,6 @@
     /* Base */
     --background: var(--color-text);
     --foreground: var(--color-bg);
-    --color-muted: var(--color-gray-700);
-    --color-muted-foreground: var(--color-gray-200);
 
     /* Card */
     --card: var(--color-text);
@@ -127,8 +123,8 @@
     --secondary-foreground: var(--color-white);
 
     /* Muted */
-    --muted: var(--color-gray-800);
-    --muted-foreground: var(--color-white);
+    --muted: var(--color-gray-700);
+    --muted-foreground: var(--color-gray-200);
 
     /* Accent */
     --accent: var(--color-accent-dark);
@@ -186,30 +182,6 @@
   strong {
     font-weight: 600;
   }
-
-  /* Đảm bảo không bị overflow trên thiết bị di động */
-  html, body {
-    overflow-x: hidden;
-    position: relative;
-    width: 100%;
-  }
-
-  body {
-    max-width: 100vw;
-  }
-
-  /* Đảm bảo các thành phần code không gây overflow */
-  code, pre {
-    max-width: 100%;
-    overflow-wrap: break-word;
-  }
-
-  @media (max-width: 768px) {
-    pre, code {
-      word-break: break-word;
-      white-space: pre-wrap;
-    }
-  }
 }
 
 @layer utilities {
@@ -232,6 +204,11 @@
   .badge--accent {
     background-color: var(--accent);
     color: var(--accent-foreground);
+  }
+
+  .muted {
+    background-color: var(--muted);
+    color: var(--muted-foreground)
   }
 
   /* Gradient text */

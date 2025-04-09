@@ -14,7 +14,8 @@ interface CodeBlockProps {
   isTypingComplete?: boolean;
   skipAnimation?: boolean;
   showCopyButton?: boolean;
-  maxWidth?: string; // Thêm để kiểm soát độ rộng tối đa
+  maxWidth?: string; // Thêm để kiểm soát độ rộng tối đa,
+  paddingTop?: string
 }
 
 export function CodeBlock({
@@ -26,6 +27,7 @@ export function CodeBlock({
   skipAnimation,
   showCopyButton = true,
   maxWidth,
+  paddingTop = '2.5rem'
 }: CodeBlockProps) {
   const { t } = useTranslation()
   const [copied, setCopied] = useState(false);
@@ -161,7 +163,7 @@ export function CodeBlock({
           customStyle={{
             margin: 0,
             padding: '1rem',
-            paddingTop: '2.5rem',
+            paddingTop: paddingTop,
             borderRadius: 0,
             fontSize: isMobile ? '0.8125rem' : '0.9375rem',
             fontFamily: "'Cascadia Code', monospace",
