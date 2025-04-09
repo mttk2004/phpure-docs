@@ -2,18 +2,20 @@ import DocLayout from '@/components/docs/DocLayout';
 import { useMDXMeta } from '@/components/docs/MDXProvider';
 import DynamicMDX from '@/components/docs/DynamicMDX';
 import { useToc } from '@/hooks';
+import { useTranslation } from 'react-i18next';
 
 export default function BuildingApplications() {
   const meta = useMDXMeta('building-applications');
   const { toc } = useToc('building-applications');
+  const { t } = useTranslation()
 
   const prev = {
-    title: "Tính năng",
+    title: t('navigation.features'),
     href: "/docs/features"
   };
 
   const next = {
-    title: "Kỹ thuật nâng cao",
+    title: t('navigation.advenced-techniques'),
     href: "/docs/advanced-techniques"
   };
 

@@ -2,18 +2,20 @@ import DocLayout from '@/components/docs/DocLayout';
 import { useMDXMeta } from '@/components/docs/MDXProvider';
 import DynamicMDX from '@/components/docs/DynamicMDX';
 import { useToc } from '@/hooks';
+import { useTranslation } from 'react-i18next';
 
 export default function CoreConcepts() {
   const meta = useMDXMeta('core-concepts');
   const { toc } = useToc('core-concepts');
+  const { t } = useTranslation()
 
   const prev = {
-    title: "Bắt đầu",
+    title: t('navigation.getting-started'),
     href: "/docs/getting-started"
   };
 
   const next = {
-    title: "Cấu trúc thư mục",
+    title: t('navigation.directory-structure'),
     href: "/docs/directory-structure"
   };
 

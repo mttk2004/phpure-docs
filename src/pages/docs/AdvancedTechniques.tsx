@@ -2,13 +2,15 @@ import DocLayout from '@/components/docs/DocLayout';
 import { useMDXMeta } from '@/components/docs/MDXProvider';
 import DynamicMDX from '@/components/docs/DynamicMDX';
 import { useToc } from '@/hooks';
+import { useTranslation } from 'react-i18next';
 
 export default function AdvancedTechniques() {
   const meta = useMDXMeta('advanced-techniques');
   const { toc } = useToc('advanced-techniques');
+  const { t } = useTranslation()
 
   const prev = {
-    title: "Xây dựng ứng dụng",
+    title: t('navigation.building-applications'),
     href: "/docs/building-applications"
   };
 

@@ -19,7 +19,16 @@
     "starOnGitHub": "Star on GitHub",
     "releases": "Releases",
     "toggleLanguage": "Toggle Language",
-    "toggleTheme": "Toggle Theme"
+    "toggleTheme": "Toggle Theme",
+
+
+    "introduction": "Introduction",
+    "getting-started": "Getting started",
+    "core-concepts": "Core concepts",
+    "directory-structure": "Directory structure",
+    "features": "Features",
+    "building-applications": "Building applications",
+    "advanced-techniques": "Advanced techniques"
   },
   "docs": {
     "previous": "Previous",

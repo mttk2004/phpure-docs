@@ -19,7 +19,15 @@
     "starOnGitHub": "Star trên GitHub",
     "releases": "Các bản phát hành",
     "toggleLanguage": "Chuyển đổi ngôn ngữ",
-    "toggleTheme": "Chuyển đổi giao diện"
+    "toggleTheme": "Chuyển đổi giao diện",
+
+    "introduction": "Giới thiệu",
+    "getting-started": "Bắt đầu",
+    "core-concepts": "Các khái niệm cơ bản",
+    "directory-structure": "Cấu trúc thư mục",
+    "features": "Tính năng",
+    "building-applications": "Xây dựng ứng dụng",
+    "advanced-techniques": "Các kỹ thuật nâng cao"
   },
   "docs": {
     "previous": "Trước",
