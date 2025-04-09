@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Link } from '@tanstack/react-router';
 import { ArrowLeft, ArrowRight, Edit, ChevronRight } from 'lucide-react';
 import { GITHUB_REPO_URL } from '@/utils';
 import { useTranslation } from 'react-i18next';
+import { useActiveHeading, useScrollToHash, useScrollToElement } from '@/hooks';
 
 interface DocNavItem {
   title: string;
@@ -36,99 +37,11 @@ export default function DocLayout({
   toc,
 }: DocLayoutProps) {
   const { t } = useTranslation();
-  const [activeId, setActiveId] = useState<string>('');
 
-  // Xử lý hash trong URL để cuộn đến vị trí tương ứng sau khi trang được tải
-  useEffect(() => {
-    const handleScrollToHash = () => {
-      const hash = window.location.hash;
-      if (hash) {
-        const id = hash.replace('#', '');
-        const element = document.getElementById(id);
-        if (element) {
-          // Đợi một chút để nội dung render hoàn tất
-          setTimeout(() => {
-            element.scrollIntoView({ behavior: 'smooth' });
-          }, 0);
-        }
-      }
-    };
-
-    // Xử lý khi trang vừa tải xong
-    handleScrollToHash();
-
-    // Thêm event listener để xử lý khi URL thay đổi (khi người dùng nhấn back/forward)
-    window.addEventListener('hashchange', handleScrollToHash);
-
-    // Cleanup
-    return () => {
-      window.removeEventListener('hashchange', handleScrollToHash);
-    };
-  }, []);
-
-  // Sử dụng Intersection Observer để theo dõi các phần tử heading và tự động cập nhật activeId
-  useEffect(() => {
-    if (!toc) return;
-
-    // Tạo danh sách các ID cần theo dõi
-    const headingIds: string[] = [];
-    toc.forEach(section => {
-      if (section.url) {
-        const id = section.url.replace('#', '');
-        if (id) headingIds.push(id);
-      }
-
-      section.items?.forEach(item => {
-        if (item.url) {
-          const id = item.url.replace('#', '');
-          if (id) headingIds.push(id);
-        }
-      });
-    });
-
-    // Tạo options cho Intersection Observer
-    const observerOptions = {
-      rootMargin: '-100px 0px -80% 0px',
-      threshold: 0
-    };
-
-    const observerCallback: IntersectionObserverCallback = (entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          setActiveId(entry.target.id);
-        }
-      });
-    };
-
-    // Tạo Observer
-    const observer = new IntersectionObserver(observerCallback, observerOptions);
-
-    // Đăng ký theo dõi các phần tử heading
-    headingIds.forEach(id => {
-      const element = document.getElementById(id);
-      if (element) {
-        observer.observe(element);
-      }
-    });
-
-    // Xử lý trường hợp khi trang vừa tải hoặc không có phần tử nào được observe
-    if (headingIds.length > 0) {
-      const firstElement = document.getElementById(headingIds[0]);
-      if (firstElement && window.scrollY < 200) {
-        setActiveId(headingIds[0]);
-      }
-    }
-
-    // Cleanup
-    return () => {
-      headingIds.forEach(id => {
-        const element = document.getElementById(id);
-        if (element) {
-          observer.unobserve(element);
-        }
-      });
-    };
-  }, [toc]);
+  // Sử dụng custom hooks
+  const activeId = useActiveHeading(toc);
+  useScrollToHash(0);
+  const scrollToElement = useScrollToElement();
 
   return (
     <div className="relative w-full max-w-5xl mx-auto">
@@ -153,7 +66,7 @@ export default function DocLayout({
           </div>
 
           {/* Điều hướng giữa các trang */}
-          <div className="mt-16 border-t border-border pt-8">
+          <div className="mt-10 sm:mt-16 md:mt-24 border-t border-border pt-8 md:pt-12">
             <div className="flex flex-col sm:flex-row sm:justify-between gap-4">
               {prev ? (
                 <Link
@@ -162,7 +75,7 @@ export default function DocLayout({
                 >
                   <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
                     <ArrowLeft className="h-4 w-4" />
-                    <span>{t('docs.previous')}</span>
+                    <span className='text-sm'>{t('docs.previous')}</span>
                   </div>
                   <span className="font-medium">{prev.title}</span>
                 </Link>
@@ -174,7 +87,7 @@ export default function DocLayout({
                   className="flex flex-col p-4 border border-border rounded-lg hover:bg-muted transition-colors text-right"
                 >
                   <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1 justify-end">
-                    <span>{t('docs.next')}</span>
+                    <span className='text-sm'>{t('docs.next')}</span>
                     <ArrowRight className="h-4 w-4" />
                   </div>
                   <span className="font-medium">{next.title}</span>
@@ -185,7 +98,7 @@ export default function DocLayout({
 
           {/* Link chỉnh sửa trên GitHub */}
           {editPath && (
-            <div className="flex justify-start mt-8">
+            <div className="flex justify-start mt-6 sm:mt-10 md:mt-16">
               <a
                 href={`${GITHUB_REPO_URL}/edit/main${editPath}`}
                 target="_blank"
@@ -213,17 +126,7 @@ export default function DocLayout({
                     <li key={i} className="space-y-2">
                       <a
                         href={section.url}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          const targetId = section.url.replace('#', '');
-                          const targetElement = document.getElementById(targetId);
-                          if (targetElement) {
-                            // Thêm id vào URL
-                            window.history.pushState({}, '', section.url);
-                            // Cuộn mượt đến vị trí
-                            targetElement.scrollIntoView({ behavior: 'smooth' });
-                          }
-                        }}
+                        onClick={(e) => scrollToElement(e, section.url)}
                         className={`block transition-colors ${
                           isSectionActive
                             ? 'text-primary font-medium'
@@ -244,17 +147,7 @@ export default function DocLayout({
                               <li key={j}>
                                 <a
                                   href={item.url}
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    const targetId = item.url.replace('#', '');
-                                    const targetElement = document.getElementById(targetId);
-                                    if (targetElement) {
-                                      // Thêm id vào URL
-                                      window.history.pushState({}, '', item.url);
-                                      // Cuộn mượt đến vị trí
-                                      targetElement.scrollIntoView({ behavior: 'smooth' });
-                                    }
-                                  }}
+                                  onClick={(e) => scrollToElement(e, item.url)}
                                   className={`block transition-colors text-xs ${
                                     isItemActive
                                       ? 'text-primary font-medium'
