@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import { ArrowLeft, ArrowRight, Edit, ChevronRight } from 'lucide-react';
 import { GITHUB_REPO_URL } from '@/utils';
@@ -36,6 +36,7 @@ export default function DocLayout({
   toc,
 }: DocLayoutProps) {
   const { t } = useTranslation();
+  const [activeId, setActiveId] = useState<string>('');
 
   // Xử lý hash trong URL để cuộn đến vị trí tương ứng sau khi trang được tải
   useEffect(() => {
@@ -48,7 +49,7 @@ export default function DocLayout({
           // Đợi một chút để nội dung render hoàn tất
           setTimeout(() => {
             element.scrollIntoView({ behavior: 'smooth' });
-          }, 300);
+          }, 0);
         }
       }
     };
@@ -64,6 +65,70 @@ export default function DocLayout({
       window.removeEventListener('hashchange', handleScrollToHash);
     };
   }, []);
+
+  // Sử dụng Intersection Observer để theo dõi các phần tử heading và tự động cập nhật activeId
+  useEffect(() => {
+    if (!toc) return;
+
+    // Tạo danh sách các ID cần theo dõi
+    const headingIds: string[] = [];
+    toc.forEach(section => {
+      if (section.url) {
+        const id = section.url.replace('#', '');
+        if (id) headingIds.push(id);
+      }
+
+      section.items?.forEach(item => {
+        if (item.url) {
+          const id = item.url.replace('#', '');
+          if (id) headingIds.push(id);
+        }
+      });
+    });
+
+    // Tạo options cho Intersection Observer
+    const observerOptions = {
+      rootMargin: '-100px 0px -80% 0px',
+      threshold: 0
+    };
+
+    const observerCallback: IntersectionObserverCallback = (entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          setActiveId(entry.target.id);
+        }
+      });
+    };
+
+    // Tạo Observer
+    const observer = new IntersectionObserver(observerCallback, observerOptions);
+
+    // Đăng ký theo dõi các phần tử heading
+    headingIds.forEach(id => {
+      const element = document.getElementById(id);
+      if (element) {
+        observer.observe(element);
+      }
+    });
+
+    // Xử lý trường hợp khi trang vừa tải hoặc không có phần tử nào được observe
+    if (headingIds.length > 0) {
+      const firstElement = document.getElementById(headingIds[0]);
+      if (firstElement && window.scrollY < 200) {
+        setActiveId(headingIds[0]);
+      }
+    }
+
+    // Cleanup
+    return () => {
+      headingIds.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+          observer.unobserve(element);
+        }
+      });
+    };
+  }, [toc]);
 
   return (
     <div className="relative w-full max-w-5xl mx-auto">
@@ -140,54 +205,72 @@ export default function DocLayout({
             <div className="fixed w-[200px] top-24 max-h-[calc(100vh-6rem)] overflow-auto pr-2">
               <h3 className="text-xs font-semibold uppercase mb-4">{t('docs.onThisPage')}</h3>
               <ul className="space-y-4 text-sm">
-                {toc.map((section, i) => (
-                  <li key={i} className="space-y-2">
-                    <a
-                      href={section.url}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        const targetId = section.url.replace('#', '');
-                        const targetElement = document.getElementById(targetId);
-                        if (targetElement) {
-                          // Thêm id vào URL
-                          window.history.pushState({}, '', section.url);
-                          // Cuộn mượt đến vị trí
-                          targetElement.scrollIntoView({ behavior: 'smooth' });
-                        }
-                      }}
-                      className="block text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                      {section.title}
-                    </a>
+                {toc.map((section, i) => {
+                  const sectionId = section.url.replace('#', '');
+                  const isSectionActive = activeId === sectionId;
 
-                    {/* Mục lục con */}
-                    {section.items && section.items.length > 0 && (
-                      <ul className="space-y-2 ml-4 pt-2">
-                        {section.items.map((item, j) => (
-                          <li key={j}>
-                            <a
-                              href={item.url}
-                              onClick={(e) => {
-                                e.preventDefault();
-                                const targetId = item.url.replace('#', '');
-                                const targetElement = document.getElementById(targetId);
-                                if (targetElement) {
-                                  // Thêm id vào URL
-                                  window.history.pushState({}, '', item.url);
-                                  // Cuộn mượt đến vị trí
-                                  targetElement.scrollIntoView({ behavior: 'smooth' });
-                                }
-                              }}
-                              className="block text-muted-foreground hover:text-foreground transition-colors text-xs"
-                            >
-                              {item.title}
-                            </a>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </li>
-                ))}
+                  return (
+                    <li key={i} className="space-y-2">
+                      <a
+                        href={section.url}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          const targetId = section.url.replace('#', '');
+                          const targetElement = document.getElementById(targetId);
+                          if (targetElement) {
+                            // Thêm id vào URL
+                            window.history.pushState({}, '', section.url);
+                            // Cuộn mượt đến vị trí
+                            targetElement.scrollIntoView({ behavior: 'smooth' });
+                          }
+                        }}
+                        className={`block transition-colors ${
+                          isSectionActive
+                            ? 'text-primary font-medium'
+                            : 'text-muted-foreground hover:text-foreground'
+                        }`}
+                      >
+                        {section.title}
+                      </a>
+
+                      {/* Mục lục con */}
+                      {section.items && section.items.length > 0 && (
+                        <ul className="space-y-2 ml-4 pt-2">
+                          {section.items.map((item, j) => {
+                            const itemId = item.url.replace('#', '');
+                            const isItemActive = activeId === itemId;
+
+                            return (
+                              <li key={j}>
+                                <a
+                                  href={item.url}
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    const targetId = item.url.replace('#', '');
+                                    const targetElement = document.getElementById(targetId);
+                                    if (targetElement) {
+                                      // Thêm id vào URL
+                                      window.history.pushState({}, '', item.url);
+                                      // Cuộn mượt đến vị trí
+                                      targetElement.scrollIntoView({ behavior: 'smooth' });
+                                    }
+                                  }}
+                                  className={`block transition-colors text-xs ${
+                                    isItemActive
+                                      ? 'text-primary font-medium'
+                                      : 'text-muted-foreground hover:text-foreground'
+                                  }`}
+                                >
+                                  {item.title}
+                                </a>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      )}
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           </div>
