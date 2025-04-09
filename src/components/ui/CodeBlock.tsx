@@ -136,12 +136,12 @@ export function CodeBlock({
         >
           {copied ? (
             <>
-              <Check className="h-4 w-4" />
+              <Check className="h-3 w-3" />
               <span>{t("others.copiedCode")}</span>
             </>
           ) : (
             <>
-              <Copy className="h-4 w-4" />
+              <Copy className="h-3 w-3" />
               <span>{t("others.copyCode")}</span>
             </>
           )}
@@ -161,7 +161,7 @@ export function CodeBlock({
           customStyle={{
             margin: 0,
             padding: '1rem',
-            paddingTop: '1.5rem',
+            paddingTop: '2.5rem',
             borderRadius: 0,
             fontSize: isMobile ? '0.8125rem' : '0.9375rem',
             fontFamily: "'Cascadia Code', monospace",
