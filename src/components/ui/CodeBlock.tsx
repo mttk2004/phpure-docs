@@ -92,8 +92,8 @@ export function CodeBlock({
       ...codeStyle['code[class*="language-"]'],
       lineHeight: '1.6',
       fontFamily: "'Cascadia Code', monospace",
-      // Cho phép xuống dòng trên màn hình nhỏ nhưng vẫn giữ indent
-      whiteSpace: isMobile ? 'pre-wrap' : 'pre',
+      // Không còn cho phép xuống dòng trên màn hình nhỏ
+      whiteSpace: 'pre',
       fontSize: isMobile ? '0.8125rem' : '0.9375rem',
       tabSize: 4,
     },
@@ -101,8 +101,8 @@ export function CodeBlock({
       ...codeStyle['pre[class*="language-"]'],
       lineHeight: '1.6',
       fontFamily: "'Cascadia Code', monospace",
-      // Cho phép xuống dòng trên màn hình nhỏ nhưng vẫn giữ indent
-      whiteSpace: isMobile ? 'pre-wrap' : 'pre',
+      // Không còn cho phép xuống dòng trên màn hình nhỏ
+      whiteSpace: 'pre',
       overflow: 'auto',
       fontSize: isMobile ? '0.8125rem' : '0.9375rem',
       tabSize: 4,
@@ -152,7 +152,7 @@ export function CodeBlock({
         className={`w-full ${isMobile ? styles.mobileContainer : ''}`}
         style={{
           maxWidth: '100%',
-          overflowX: isMobile ? 'hidden' : 'auto'
+          overflowX: 'auto' // Luôn cho phép scroll ngang
         }}
       >
         <SyntaxHighlighter
@@ -169,33 +169,34 @@ export function CodeBlock({
             transition: 'all 0.2s ease-in-out',
             lineHeight: '1.6',
             maxWidth: '100%',
-            overflow: isMobile ? 'visible' : 'auto',
-            whiteSpace: isMobile ? 'pre-wrap' : 'pre',
+            overflow: 'auto', // Luôn cho phép scroll
+            whiteSpace: 'pre', // Không cho phép xuống dòng
             tabSize: 4,
             MozTabSize: 4,
             OTabSize: 4,
-            ...(isMobile && {
-              overflowWrap: 'break-word',
-              wordWrap: 'break-word',
-              wordBreak: 'normal',
-              overflowX: 'hidden'
-            })
+            // Thêm các thuộc tính để ngăn code wrap
+            wordBreak: 'keep-all',
+            wordSpacing: 'normal',
+            textRendering: 'optimizeLegibility',
+            WebkitFontSmoothing: 'antialiased',
+            // Tùy chỉnh CSS cho cả mobile
+            textSizeAdjust: '100%', // Thêm để ngăn iOS thay đổi font size
+            WebkitTextSizeAdjust: '100%', // Cho Safari
+            MozTextSizeAdjust: '100%', // Cho Firefox
           }}
           wrapLines={true}
-          wrapLongLines={isMobile} // Cho phép ngắt dòng trên thiết bị di động
+          wrapLongLines={false} // Không ngắt dòng
           lineProps={() => ({
             style: {
               display: 'block',
               lineHeight: '1.6',
-              whiteSpace: isMobile ? 'pre-wrap' : 'pre',
+              whiteSpace: 'pre', // Không cho phép xuống dòng
               tabSize: 4,
               MozTabSize: 4,
               OTabSize: 4,
-              ...(isMobile && {
-                overflowWrap: 'break-word',
-                wordWrap: 'break-word',
-                wordBreak: 'normal'
-              })
+              // Thêm các thuộc tính để ngăn code wrap
+              wordBreak: 'keep-all',
+              wordSpacing: 'normal'
             },
             className: styles.syntaxLine
           })}
@@ -217,15 +218,13 @@ export function CodeBlock({
               fontSize: isMobile ? '0.8125rem' : '0.9375rem',
               fontFamily: "'Cascadia Code', monospace",
               lineHeight: '1.6',
-              whiteSpace: isMobile ? 'pre-wrap' : 'pre',
+              whiteSpace: 'pre', // Không còn cho phép xuống dòng
               tabSize: 4,
               MozTabSize: 4,
               OTabSize: 4,
-              ...(isMobile && {
-                overflowWrap: 'break-word',
-                wordWrap: 'break-word',
-                wordBreak: 'normal'
-              })
+              textSizeAdjust: '100%', // Thêm để ngăn iOS thay đổi font size
+              WebkitTextSizeAdjust: '100%', // Cho Safari
+              MozTextSizeAdjust: '100%', // Cho Firefox
             }
           }}
         >

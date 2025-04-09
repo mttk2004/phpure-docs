@@ -90,56 +90,45 @@
     width: 100% !important;
     position: relative !important;
     box-sizing: border-box !important;
-    overflow-x: hidden !important;
+    overflow-x: auto !important;
   }
 
   .codeContainer :global(pre) {
     max-width: 100% !important;
-    white-space: pre-wrap !important;
+    white-space: pre !important;
     tab-size: 4 !important;
     -moz-tab-size: 4 !important;
     -o-tab-size: 4 !important;
-    overflow-wrap: break-word !important;
-    word-wrap: break-word !important;
-    word-break: normal !important;
-    overflow-x: hidden !important;
+    overflow-x: auto !important;
   }
 
   .codeContainer :global(code) {
-    white-space: pre-wrap !important;
+    white-space: pre !important;
     tab-size: 4 !important;
     -moz-tab-size: 4 !important;
     -o-tab-size: 4 !important;
-    overflow-wrap: break-word !important;
-    word-wrap: break-word !important;
-    word-break: normal !important;
-    overflow-x: hidden !important;
+    overflow-x: auto !important;
   }
 
   .codeContainer :global(.token) {
-    white-space: pre-wrap !important;
+    white-space: pre !important;
     tab-size: 4 !important;
     -moz-tab-size: 4 !important;
     -o-tab-size: 4 !important;
-    overflow-wrap: break-word !important;
-    word-wrap: break-word !important;
   }
 
   .syntaxLine {
-    white-space: pre-wrap !important;
+    white-space: pre !important;
     tab-size: 4 !important;
     -moz-tab-size: 4 !important;
     -o-tab-size: 4 !important;
     display: block !important;
     width: 100% !important;
-    overflow-wrap: break-word !important;
-    word-wrap: break-word !important;
-    word-break: normal !important;
-    overflow-x: hidden !important;
+    overflow-x: visible !important;
   }
 
   .codeContainer :global(.token.punctuation) {
-    white-space: normal !important;
+    white-space: pre !important;
   }
 
   .codeContainer :global(.token.punctuation:first-child) {
@@ -148,7 +137,7 @@
 
   .codeContainer :global(pre[class*="language-"]) {
     max-width: 100% !important;
-    overflow-x: hidden !important;
+    overflow-x: auto !important;
   }
 }
 
@@ -213,16 +202,18 @@
 
 /* Class đặc biệt cho mobile container */
 .mobileContainer {
-  overflow-x: hidden !important;
+  overflow-x: auto !important;
   max-width: 100% !important;
   width: 100% !important;
 }
 
 .mobileContainer :global(pre) {
   max-width: 100% !important;
-  overflow-x: visible !important;
+  overflow-x: auto !important;
+  white-space: pre !important;
 }
 
 .mobileContainer :global(code) {
   max-width: 100% !important;
+  white-space: pre !important;
 }
