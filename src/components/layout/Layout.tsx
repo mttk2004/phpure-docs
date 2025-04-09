@@ -56,8 +56,8 @@ export default function Layout({ children }: LayoutProps) {
             {children}
           </div>
 
-          <footer className="border-t border-border px-4 py-6 sm:p-6 md:p-8 mt-12 md:mt-16">
-            <div className="container mx-auto px-2 sm:px-4 md:px-6">
+          <footer className="border-t border-border px-4 py-6 sm:p-6 md:p-8 mt-6 md:mt-12">
+            <div className="container mx-auto p-2 sm:p-4 md:p-6">
               <div className="flex flex-col sm:flex-row justify-between items-center text-sm text-muted-foreground">
                 <p>© {new Date().getFullYear()} PHPure. All rights reserved.</p>
                 <div className="flex items-center gap-4 mt-4 sm:mt-0">

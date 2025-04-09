@@ -66,7 +66,7 @@ export default function DocLayout({
           </div>
 
           {/* Điều hướng giữa các trang */}
-          <div className="mt-10 sm:mt-16 md:mt-24 border-t border-border pt-8 md:pt-12">
+          <div className="mt-10 sm:mt-16 md:mt-24 border-t border-border pt-8 sm:pt-12 md:pt-16">
             <div className="flex flex-col sm:flex-row sm:justify-between gap-4">
               {prev ? (
                 <Link

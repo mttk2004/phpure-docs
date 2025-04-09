@@ -30,9 +30,10 @@ export function CodeBlock({
   const { t } = useTranslation()
   const [copied, setCopied] = useState(false);
   const { theme } = useTheme();
-  const [isDarkTheme, setIsDarkTheme] = useState(theme === 'dark');
+  const [isDarkTheme, setIsDarkTheme] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [themeInitialized, setThemeInitialized] = useState(false);
 
   // Kiểm tra kích thước màn hình
   useEffect(() => {
@@ -52,8 +53,23 @@ export function CodeBlock({
 
   // Cập nhật trạng thái theme khi theme thay đổi
   useEffect(() => {
-    setIsDarkTheme(theme === 'dark');
+    // Chỉ cập nhật khi đã có giá trị theme từ hook
+    if (theme) {
+      setIsDarkTheme(theme === 'dark');
+      setThemeInitialized(true);
+    }
   }, [theme]);
+
+  // Hiệu ứng tải trang - ẩn nội dung cho đến khi xác định được theme
+  useEffect(() => {
+    // Xác định theme từ localStorage hoặc system preference khi component mount
+    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const initialTheme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+
+    setIsDarkTheme(initialTheme === 'dark');
+    setThemeInitialized(true);
+  }, []);
 
   // Hàm xử lý sao chép mã
   const handleCopyCode = () => {
@@ -78,7 +94,7 @@ export function CodeBlock({
       fontFamily: "'Cascadia Code', monospace",
       // Cho phép xuống dòng trên màn hình nhỏ nhưng vẫn giữ indent
       whiteSpace: isMobile ? 'pre-wrap' : 'pre',
-      fontSize: isMobile ? '0.875rem' : '1rem',
+      fontSize: isMobile ? '0.8125rem' : '0.9375rem',
       tabSize: 4,
     },
     'pre[class*="language-"]': {
@@ -88,7 +104,7 @@ export function CodeBlock({
       // Cho phép xuống dòng trên màn hình nhỏ nhưng vẫn giữ indent
       whiteSpace: isMobile ? 'pre-wrap' : 'pre',
       overflow: 'auto',
-      fontSize: isMobile ? '0.875rem' : '1rem',
+      fontSize: isMobile ? '0.8125rem' : '0.9375rem',
       tabSize: 4,
     }
   };
@@ -107,7 +123,8 @@ export function CodeBlock({
       ref={containerRef}
       style={{
         maxWidth: maxWidth || '100%',
-        overflowX: isMobile ? 'hidden' : 'auto'
+        overflowX: isMobile ? 'hidden' : 'auto',
+        visibility: themeInitialized ? 'visible' : 'hidden'
       }}
     >
       {showCopyButton && (
@@ -146,7 +163,7 @@ export function CodeBlock({
             padding: '1rem',
             paddingTop: '1.5rem',
             borderRadius: 0,
-            fontSize: isMobile ? '0.875rem' : '1rem',
+            fontSize: isMobile ? '0.8125rem' : '0.9375rem',
             fontFamily: "'Cascadia Code', monospace",
             backgroundColor: bgColor,
             transition: 'all 0.2s ease-in-out',
@@ -190,14 +207,14 @@ export function CodeBlock({
             textAlign: 'right',
             userSelect: 'none',
             fontFamily: "'Cascadia Code', monospace",
-            fontSize: isMobile ? '0.875rem' : '1rem',
+            fontSize: isMobile ? '0.8125rem' : '0.9375rem',
             fontStyle: 'normal', // Loại bỏ kiểu italic cho số dòng
             opacity: 0.6, // Làm mờ số dòng
             lineHeight: '1.6'
           }}
           codeTagProps={{
             style: {
-              fontSize: isMobile ? '0.875rem' : '1rem',
+              fontSize: isMobile ? '0.8125rem' : '0.9375rem',
               fontFamily: "'Cascadia Code', monospace",
               lineHeight: '1.6',
               whiteSpace: isMobile ? 'pre-wrap' : 'pre',

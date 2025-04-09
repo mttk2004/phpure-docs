@@ -1,6 +1,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { CodeBlock } from '@/components/ui/CodeBlock';
+import { Link } from '@tanstack/react-router';
 
 interface MDXContentProps {
   children: React.ReactNode;
@@ -64,7 +65,7 @@ export const MDXComponents = {
       .replace(/-+$/, '');
 
     return (
-      <h1 id={id} className={cn("mt-2 scroll-m-20 text-3xl font-bold tracking-tight", className)} {...props} />
+      <h1 id={id} className={cn("mt-6 scroll-m-20 text-3xl font-bold tracking-tight", className)} {...props} />
     );
   },
   h2: ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => {
@@ -215,9 +216,30 @@ export const MDXComponents = {
   td: ({ className, ...props }: React.HTMLAttributes<HTMLTableCellElement>) => (
     <td className={cn("border border-border px-4 py-2 text-left", className)} {...props} />
   ),
-  a: ({ className, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
-    <a className={cn("text-primary no-underline hover:underline", className)} {...props} />
-  ),
+  a: ({ className, href, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
+    // Kiểm tra nếu href là external link
+    const isExternal = href?.startsWith('http') || href?.startsWith('https') || href?.startsWith('//');
+
+    if (isExternal) {
+      return (
+        <a
+          className={cn("text-primary no-underline hover:underline", className)}
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          {...props}
+        />
+      );
+    }
+
+    return (
+      <Link
+        className={cn("text-primary no-underline hover:underline", className)}
+        to={href || ''}
+        {...props}
+      />
+    );
+  },
   img: ({ className, alt, ...props }: React.ImgHTMLAttributes<HTMLImageElement>) => (
     <img className={cn("rounded-md border border-border", className)} alt={alt} {...props} />
   ),
