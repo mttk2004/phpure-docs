@@ -21,7 +21,7 @@ User-agent: Googlebot-Mobile
 Allow: /
 
 # Đường dẫn đến sitemap
-Sitemap: https://phpure-docs.example.com/sitemap.xml
+Sitemap: https://phpure.netlify.app/sitemap.xml
 
 # Disallow một số đường dẫn không hữu ích cho người dùng (nếu có)
 # Disallow: /assets/
@@ -107,64 +107,32 @@ export default defineConfig({
     },
   },
   build: {
-    // Tối ưu hóa bundle size
     minify: 'terser',
     terserOptions: {
       compress: {
         drop_console: true,
         drop_debugger: true,
-        passes: 2, // Nhiều lần tối ưu
+        passes: 2,
       },
       mangle: {
         safari10: true,
       },
     },
     rollupOptions: {
-      output: {
-        // Sử dụng splitVendorChunkPlugin thay vì manualChunks tùy chỉnh
-        // manualChunks bị comment để tránh xung đột
-        /* manualChunks: (id) => {
-          // Xác định chunks theo pattern để tối ưu hơn
-          if (id.includes('node_modules')) {
-            // Nhóm React và các thư viện phụ thuộc vào React vào cùng một chunk
-            if (id.includes('react') || id.includes('@mdx-js/react') || id.includes('mdx'))
-              return 'react-vendor';
-
-            // Các thư viện UI vẫn giữ nguyên
-            if (id.includes('framer-motion') || id.includes('clsx') || id.includes('tailwind-merge'))
-              return 'ui-vendor';
-
-            // Routing vẫn giữ nguyên
-            if (id.includes('tanstack') || id.includes('router'))
-              return 'router';
-
-            // i18n vẫn giữ nguyên
-            if (id.includes('i18next'))
-              return 'i18n';
-
-            // Các thư viện nhỏ khác gộp vào vendor
-            return 'vendor';
-          }
-        }, */
-      },
+      output: {},
     },
-    // Tăng giới hạn cảnh báo kích thước chunk lên 1000kB (1MB)
     chunkSizeWarningLimit: 1000,
-    // Tối ưu hóa assets
-    assetsInlineLimit: 4096, // 4KB
+    assetsInlineLimit: 4096,
   },
-  // Tối ưu hóa quá trình dev và preview
   optimizeDeps: {
     include: ['react', 'react-dom', '@tanstack/react-router'],
-    exclude: ['@mdx-js/react'], // Tránh tối ưu quá sớm modules có side effects
+    exclude: ['@mdx-js/react'],
   },
   esbuild: {
-    // Loại bỏ code không sử dụng
     pure: ['console.log', 'console.info', 'console.debug', 'console.trace'],
-    // Tối ưu hóa code
     minifyIdentifiers: true,
     minifySyntax: true,
     minifyWhitespace: true,
-    legalComments: 'none', // Loại bỏ các comment về license
+    legalComments: 'none',
   },
 })

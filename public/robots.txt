@@ -9,7 +9,7 @@ User-agent: Googlebot-Mobile
 Allow: /
 
 # Đường dẫn đến sitemap
-Sitemap: https://phpure-docs.example.com/sitemap.xml
+Sitemap: https://phpure.netlify.app/sitemap.xml
 
 # Disallow một số đường dẫn không hữu ích cho người dùng (nếu có)
 # Disallow: /assets/
