@@ -110,25 +110,37 @@ export default defineConfig({
       compress: {
         drop_console: true,
         drop_debugger: true,
+        passes: 2, // Nhiều lần tối ưu
+      },
+      mangle: {
+        safari10: true,
       },
     },
     rollupOptions: {
       output: {
-        manualChunks: {
-          // Tách các thư viện lớn thành những chunk riêng biệt
-          'react-vendor': ['react', 'react-dom'],
-          'ui-vendor': ['framer-motion', 'clsx', 'tailwind-merge'],
-          'router': ['@tanstack/react-router'],
-          'i18n': ['i18next', 'react-i18next'],
+        manualChunks: (id) => {
+          // Xác định chunks theo pattern để tối ưu hơn
+          if (id.includes('node_modules')) {
+            if (id.includes('react')) return 'react-vendor';
+            if (id.includes('framer-motion') || id.includes('clsx') || id.includes('tailwind-merge'))
+              return 'ui-vendor';
+            if (id.includes('tanstack') || id.includes('router')) return 'router';
+            if (id.includes('i18next')) return 'i18n';
+            // Các thư viện nhỏ khác gộp vào vendor
+            return 'vendor';
+          }
         },
       },
     },
     // Giới hạn kích thước chunk
     chunkSizeWarningLimit: 1000,
+    // Tối ưu hóa assets
+    assetsInlineLimit: 4096, // 4KB
   },
   // Tối ưu hóa quá trình dev và preview
   optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router-dom'],
+    include: ['react', 'react-dom', '@tanstack/react-router'],
+    exclude: ['@mdx-js/react'], // Tránh tối ưu quá sớm modules có side effects
   },
   esbuild: {
     // Loại bỏ code không sử dụng
@@ -137,5 +149,6 @@ export default defineConfig({
     minifyIdentifiers: true,
     minifySyntax: true,
     minifyWhitespace: true,
+    legalComments: 'none', // Loại bỏ các comment về license
   },
 })

@@ -1,12 +1,12 @@
 .codeContainer {
   position: relative;
-  font-family: 'Cascadia Code', monospace !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
   max-width: 100%;
   overflow-x: hidden;
 }
 
 .syntaxLine {
-  font-family: 'Cascadia Code', monospace !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
   line-height: 1.6 !important; /* Chuẩn hóa line-height cho cả light và dark theme */
 }
 
@@ -14,7 +14,7 @@
 .codeContainer :global(pre),
 .codeContainer :global(code),
 .codeContainer :global(span) {
-  font-family: 'Cascadia Code', monospace !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
 }
 
 /* Fix lỗi font-size cho token */
@@ -26,7 +26,7 @@
 .codeContainer :global(.linenumber) {
   font-style: normal !important; /* Bỏ kiểu italic */
   opacity: 0.6 !important; /* Làm mờ hơn */
-  font-family: 'Cascadia Code', monospace !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
 }
 
 /* Animation cho nút copy */

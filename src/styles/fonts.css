@@ -1,12 +1,4 @@
-@font-face {
-  font-family: 'Cascadia Code';
-  src: url('../assets/fonts/CascadiaCode.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* Đặt Cascadia Code là font mặc định cho các phần tử pre và code */
+/* Sử dụng system fonts cho code để giảm kích thước */
 pre, code, .code-font {
-  font-family: 'Cascadia Code', monospace !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
 }

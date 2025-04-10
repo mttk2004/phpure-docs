@@ -93,7 +93,7 @@ export function CodeBlock({
     'code[class*="language-"]': {
       ...codeStyle['code[class*="language-"]'],
       lineHeight: '1.6',
-      fontFamily: "'Cascadia Code', monospace",
+      fontFamily: "'Roboto Mono Variable', monospace",
       // Không còn cho phép xuống dòng trên màn hình nhỏ
       whiteSpace: 'pre',
       fontSize: isMobile ? '0.8125rem' : '0.9375rem',
@@ -102,7 +102,7 @@ export function CodeBlock({
     'pre[class*="language-"]': {
       ...codeStyle['pre[class*="language-"]'],
       lineHeight: '1.6',
-      fontFamily: "'Cascadia Code', monospace",
+      fontFamily: "'Roboto Mono Variable', monospace",
       // Không còn cho phép xuống dòng trên màn hình nhỏ
       whiteSpace: 'pre',
       overflow: 'auto',
@@ -166,7 +166,7 @@ export function CodeBlock({
             paddingTop: paddingTop,
             borderRadius: 0,
             fontSize: isMobile ? '0.8125rem' : '0.9375rem',
-            fontFamily: "'Cascadia Code', monospace",
+            fontFamily: "'Roboto Mono Variable', monospace",
             backgroundColor: bgColor,
             transition: 'all 0.2s ease-in-out',
             lineHeight: '1.6',
@@ -209,7 +209,7 @@ export function CodeBlock({
             color: isDarkTheme ? '#858585' : '#A0A0A0',
             textAlign: 'right',
             userSelect: 'none',
-            fontFamily: "'Cascadia Code', monospace",
+            fontFamily: "'Roboto Mono Variable', monospace",
             fontSize: isMobile ? '0.8125rem' : '0.9375rem',
             fontStyle: 'normal', // Loại bỏ kiểu italic cho số dòng
             opacity: 0.6, // Làm mờ số dòng
@@ -218,7 +218,7 @@ export function CodeBlock({
           codeTagProps={{
             style: {
               fontSize: isMobile ? '0.8125rem' : '0.9375rem',
-              fontFamily: "'Cascadia Code', monospace",
+              fontFamily: "'Roboto Mono Variable', monospace",
               lineHeight: '1.6',
               whiteSpace: 'pre', // Không còn cho phép xuống dòng
               tabSize: 4,

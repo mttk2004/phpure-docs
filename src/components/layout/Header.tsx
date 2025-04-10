@@ -47,7 +47,7 @@ export default function Header({ isSidebarOpen, onMenuClick }: HeaderProps) {
             to="/"
             className="flex items-center gap-2 font-bold text-xl"
           >
-            <span className="text-gradient -skew-x-5 -skew-y-2">PHPure</span>
+            <span className="text-primary font-bold">PHPure</span>
           </Link>
         </div>
 

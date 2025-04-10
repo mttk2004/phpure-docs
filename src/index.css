@@ -176,7 +176,7 @@
   }
 
   code, pre {
-    font-family: 'Cascadia Code', mon;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   }
 
   strong {
@@ -345,6 +345,6 @@
   }
 
   .font-script {
-    font-family: 'Cascadia Code', monospace;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   }
 }
