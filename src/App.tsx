@@ -1,3 +1,4 @@
+import React from 'react';
 import { Routes } from './routes';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { MDXProvider } from '@mdx-js/react';
