@@ -7,6 +7,7 @@ import tailwindcss from "@tailwindcss/vite"
 import { TanStackRouterVite } from '@tanstack/router-vite-plugin'
 import fs from 'fs'
 import { compression as viteCompression } from 'vite-plugin-compression2'
+import { splitVendorChunkPlugin } from 'vite'
 
 // Nội dung robots.txt mặc định
 const defaultRobotsTxt = `# PHPure Documentation Website - robots.txt
@@ -31,12 +32,14 @@ Sitemap: https://phpure-docs.example.com/sitemap.xml
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
-    TanStackRouterVite(),
     react(),
     mdx({
       providerImportSource: '@mdx-js/react',
     }),
     tsconfigPaths(),
+    TanStackRouterVite(),
+    viteCompression(),
+    splitVendorChunkPlugin(),
     tailwindcss(),
     // Thêm plugin nén gzip và brotli
     viteCompression({
@@ -96,7 +99,7 @@ export default defineConfig({
           console.error('Lỗi khi tạo file SEO:', error);
         }
       }
-    }
+    },
   ],
   resolve: {
     alias: {
@@ -118,21 +121,34 @@ export default defineConfig({
     },
     rollupOptions: {
       output: {
-        manualChunks: (id) => {
+        // Sử dụng splitVendorChunkPlugin thay vì manualChunks tùy chỉnh
+        // manualChunks bị comment để tránh xung đột
+        /* manualChunks: (id) => {
           // Xác định chunks theo pattern để tối ưu hơn
           if (id.includes('node_modules')) {
-            if (id.includes('react')) return 'react-vendor';
+            // Nhóm React và các thư viện phụ thuộc vào React vào cùng một chunk
+            if (id.includes('react') || id.includes('@mdx-js/react') || id.includes('mdx'))
+              return 'react-vendor';
+
+            // Các thư viện UI vẫn giữ nguyên
             if (id.includes('framer-motion') || id.includes('clsx') || id.includes('tailwind-merge'))
               return 'ui-vendor';
-            if (id.includes('tanstack') || id.includes('router')) return 'router';
-            if (id.includes('i18next')) return 'i18n';
+
+            // Routing vẫn giữ nguyên
+            if (id.includes('tanstack') || id.includes('router'))
+              return 'router';
+
+            // i18n vẫn giữ nguyên
+            if (id.includes('i18next'))
+              return 'i18n';
+
             // Các thư viện nhỏ khác gộp vào vendor
             return 'vendor';
           }
-        },
+        }, */
       },
     },
-    // Giới hạn kích thước chunk
+    // Tăng giới hạn cảnh báo kích thước chunk lên 1000kB (1MB)
     chunkSizeWarningLimit: 1000,
     // Tối ưu hóa assets
     assetsInlineLimit: 4096, // 4KB
