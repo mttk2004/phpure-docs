@@ -4,6 +4,7 @@ import { ArrowRight, Github, Package, Zap, Code, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CodeBlock } from '@/components/ui/CodeBlock';
 import { GITHUB_REPO_URL, GITHUB_STAR_URL } from '@/utils';
+import SEO from '@/components/common/SEO';
 
 
 const phpCodeExample = `<?php
@@ -62,9 +63,19 @@ export default function HomePage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
-      {/* Hero section */}
-      <section className="w-full pt-8 md:pt-12 pb-20 border-b border-border">
+    <>
+      <SEO
+        title="PHPure Framework - Nhẹ nhàng và Mạnh mẽ"
+        description="PHPure là một PHP framework nhẹ nhàng và mạnh mẽ, tập trung vào hiệu suất cao, dễ học và linh hoạt trong phát triển ứng dụng web hiện đại."
+        keywords="PHP, framework, MVC, PHPure, web development, lightweight"
+        slug="phpure-framework-lightweight-and-powerful"
+        type="website"
+        ogImage="/images/phpure-og-image.jpg"
+      />
+
+      <div className="flex flex-col min-h-screen">
+        {/* Hero section */}
+        <section className="w-full pt-8 md:pt-12 pb-20 border-b border-border">
           <div className="max-w-3xl mx-auto mb-10 text-center">
             <div className="inline-flex items-center justify-center px-3 py-1 mb-6 text-sm rounded-full bg-muted">
               <span className="badge badge--accent font-medium">PHPure v0.0.3 ra mắt</span>
@@ -146,10 +157,10 @@ export default function HomePage() {
               </div>
             </div>
           </div>
-      </section>
+        </section>
 
-      {/* Features section */}
-      <section className="w-full py-20">
+        {/* Features section */}
+        <section className="w-full py-20">
           <div className="max-w-3xl mx-auto mb-16 text-center">
             <h2 className="mb-4 text-3xl font-bold tracking-tight md:text-4xl">
               Thiết kế cho <span className="box-gradient"><span>hiệu suất</span></span>
@@ -190,10 +201,10 @@ export default function HomePage() {
               </p>
             </div>
           </div>
-      </section>
+        </section>
 
-      {/* CTA section */}
-      <section className="w-full py-16 md:py-24 bg-muted">
+        {/* CTA section */}
+        <section className="w-full py-16 md:py-24 bg-muted">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="mb-6 text-3xl font-bold tracking-tight md:text-4xl">
               Sẵn sàng để bắt đầu với PHPure?
@@ -221,7 +232,8 @@ export default function HomePage() {
               </a>
             </div>
           </div>
-      </section>
-    </div>
+        </section>
+      </div>
+    </>
   );
 }

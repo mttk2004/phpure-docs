@@ -1,9 +1,12 @@
 <!doctype html>
-<html lang="en">
+<html>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PHPure Documentation</title>
+    <meta name="robots" content="index, follow" />
+
+    <!-- Preload fonts -->
     <link rel="preload" href="/src/assets/fonts/CascadiaCode.ttf" as="font" type="font/ttf" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,5 +15,13 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+
+    <!-- JavaScript sẽ cập nhật lang attribute dựa trên ngôn ngữ đã chọn -->
+    <script>
+      // Lấy ngôn ngữ từ localStorage (i18next lưu tại đây)
+      const language = localStorage.getItem('i18nextLng') || 'vi';
+      // Cập nhật thuộc tính lang cho thẻ html
+      document.documentElement.lang = language;
+    </script>
   </body>
 </html>

@@ -13,7 +13,6 @@ interface DocNavItem {
 interface DocLayoutProps {
   children: React.ReactNode;
   title: string;
-  description?: string;
   editPath?: string;
   prev?: DocNavItem;
   next?: DocNavItem;
@@ -30,7 +29,6 @@ interface DocLayoutProps {
 export default function DocLayout({
   children,
   title,
-  description,
   editPath,
   prev,
   next,
@@ -45,10 +43,6 @@ export default function DocLayout({
 
   return (
     <div className="relative w-full max-w-5xl mx-auto">
-      {/* SEO Meta Tags - Sử dụng tính năng mới của React 19 */}
-      <title>PHPure Documentation - {title}</title>
-      {description && <meta name="description" content={description} />}
-
       {/* Đường dẫn */}
       <div className="flex items-center text-sm text-muted-foreground mb-6">
         <Link to="/docs" className="hover:text-foreground transition-colors">

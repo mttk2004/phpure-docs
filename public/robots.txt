@@ -1,0 +1,17 @@
+# PHPure Documentation Website - robots.txt
+# Cho phép tất cả robot truy cập vào tất cả các trang
+
+User-agent: *
+Allow: /
+
+# Đảm bảo Googlebot mobile có thể truy cập
+User-agent: Googlebot-Mobile
+Allow: /
+
+# Đường dẫn đến sitemap
+Sitemap: https://phpure-docs.example.com/sitemap.xml
+
+# Disallow một số đường dẫn không hữu ích cho người dùng (nếu có)
+# Disallow: /assets/
+# Disallow: /.git/
+# Disallow: /node_modules/
