@@ -6,6 +6,7 @@ import path from "path"
 import tailwindcss from "@tailwindcss/vite"
 import { TanStackRouterVite } from '@tanstack/router-vite-plugin'
 import fs from 'fs'
+import { compression as viteCompression } from 'vite-plugin-compression2'
 
 // Nội dung robots.txt mặc định
 const defaultRobotsTxt = `# PHPure Documentation Website - robots.txt
@@ -37,6 +38,17 @@ export default defineConfig({
     }),
     tsconfigPaths(),
     tailwindcss(),
+    // Thêm plugin nén gzip và brotli
+    viteCompression({
+      algorithm: 'gzip',
+      exclude: [/\.(br)$/, /\.(gz)$/],
+      threshold: 10240, // Chỉ nén file lớn hơn 10KB
+    }),
+    viteCompression({
+      algorithm: 'brotliCompress',
+      exclude: [/\.(br)$/, /\.(gz)$/],
+      threshold: 10240,
+    }),
     // Plugin phục vụ robots.txt trong môi trường phát triển
     {
       name: 'serve-robots-txt',
@@ -90,5 +102,40 @@ export default defineConfig({
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
+  },
+  build: {
+    // Tối ưu hóa bundle size
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+      },
+    },
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Tách các thư viện lớn thành những chunk riêng biệt
+          'react-vendor': ['react', 'react-dom'],
+          'ui-vendor': ['framer-motion', 'clsx', 'tailwind-merge'],
+          'router': ['@tanstack/react-router'],
+          'i18n': ['i18next', 'react-i18next'],
+        },
+      },
+    },
+    // Giới hạn kích thước chunk
+    chunkSizeWarningLimit: 1000,
+  },
+  // Tối ưu hóa quá trình dev và preview
+  optimizeDeps: {
+    include: ['react', 'react-dom', 'react-router-dom'],
+  },
+  esbuild: {
+    // Loại bỏ code không sử dụng
+    pure: ['console.log', 'console.info', 'console.debug', 'console.trace'],
+    // Tối ưu hóa code
+    minifyIdentifiers: true,
+    minifySyntax: true,
+    minifyWhitespace: true,
   },
 })

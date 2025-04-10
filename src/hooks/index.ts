@@ -3,3 +3,4 @@ export * from './useToc';
 export { useActiveHeading } from './useActiveHeading';
 export { useScrollToHash } from './useScrollToHash';
 export { useScrollToElement } from './useScrollToElement';
+export { usePerformanceOptimizations } from './usePerformanceOptimizations';
