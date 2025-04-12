@@ -42,7 +42,7 @@ const buttonThemeStyles = `
 }
 .button-outline:hover {
   background-color: var(--color-accent);
-  color: var(--color-white);
+  color: var(--color-accent-foreground);
 }
 .dark .button-outline:hover {
   background-color: var(--color-accent-dark);

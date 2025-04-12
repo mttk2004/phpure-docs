@@ -52,7 +52,7 @@ export default function Header({ isSidebarOpen, onMenuClick }: HeaderProps) {
         </div>
 
         <div className="flex items-center gap-2">
-          <nav className="hidden md:flex items-center gap-4 mr-4">
+          <nav className="hidden md:flex items-center gap-6 mr-4 font-medium">
             <Link
               to="/docs"
               className="text-sm text-muted-foreground hover:text-primary transition-colors"
@@ -68,6 +68,13 @@ export default function Header({ isSidebarOpen, onMenuClick }: HeaderProps) {
             >
               {t('navigation.releases')}
             </a>
+            <Link
+              to="/contribute"
+              className="text-sm text-muted-foreground hover:text-primary transition-colors"
+              activeProps={{ className: "text-primary font-medium" }}
+            >
+              {t('navigation.contribute')}
+            </Link>
           </nav>
 
           <Button
@@ -107,7 +114,7 @@ export default function Header({ isSidebarOpen, onMenuClick }: HeaderProps) {
           >
             <Button variant="outline" size="sm" className="gap-2 cursor-pointer">
               <Github size={16} />
-              <span>{t('navigation.starOnGitHub')}</span>
+              <span className="font-medium">{t('navigation.starOnGitHub')}</span>
             </Button>
           </a>
         </div>

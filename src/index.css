@@ -222,7 +222,7 @@
   .box-gradient {
     display: inline-block;
     background-image: linear-gradient(45deg, var(--primary), var(--accent));
-    padding: 0.2rem 0.5rem 0.35rem;
+    padding: .2rem .4rem .4rem;
     border-radius: 0.15rem;
     position: relative;
     transform: rotate(-3deg) translateY(0.2rem);
