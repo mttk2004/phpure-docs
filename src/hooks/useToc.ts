@@ -58,7 +58,10 @@ export function useToc(contentKey: string, isGitHubContent: boolean = false, ver
             // Try to get content with the current language
             const content = await fetchDocumentation(filename, language, version);
             const headings = extractHeadingsFromMarkdown(content);
-            const generatedToc = generateTocFromHeadings(headings);
+            const generatedToc = generateTocFromHeadings(headings.map(heading => ({
+              ...heading,
+              text: heading.title
+            })));
 
             if (generatedToc.length > 0) {
               setToc(generatedToc);
@@ -74,7 +77,10 @@ export function useToc(contentKey: string, isGitHubContent: boolean = false, ver
                 // Fallback to English if the current language failed
                 const fallbackContent = await fetchDocumentation(filename, 'en', version);
                 const headings = extractHeadingsFromMarkdown(fallbackContent);
-                const generatedToc = generateTocFromHeadings(headings);
+                const generatedToc = generateTocFromHeadings(headings.map(heading => ({
+                  ...heading,
+                  text: heading.title
+                })));
 
                 if (generatedToc.length > 0) {
                   setToc(generatedToc);

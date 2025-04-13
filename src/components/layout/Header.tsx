@@ -68,13 +68,12 @@ export default function Header({ isSidebarOpen, onMenuClick }: HeaderProps) {
             >
               {t('navigation.releases')}
             </a>
-            <Link
-              to="/contribute"
+            <a
+              href="/contribute"
               className="text-sm text-muted-foreground hover:text-primary transition-colors"
-              activeProps={{ className: "text-primary font-medium" }}
             >
               {t('navigation.contribute')}
-            </Link>
+            </a>
           </nav>
 
           <Button

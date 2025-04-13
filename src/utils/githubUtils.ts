@@ -1,3 +1,4 @@
+
 /**
  * Current version of documentation to fetch
  * This can be updated as newer versions are released
@@ -54,6 +55,18 @@ export async function fetchDocumentation(
  * @param branch Branch name (defaults to main)
  * @returns Promise containing an array of documentation file names
  */
+// Define interface for GitHub content item
+interface GitHubContentItem {
+  name: string;
+  type: string;
+  path?: string;
+  sha?: string;
+  size?: number;
+  url?: string;
+  download_url?: string | null;
+  html_url?: string;
+}
+
 export async function listDocumentationFiles(
   language: string = 'en',
   version: string = CURRENT_DOC_VERSION,
@@ -68,12 +81,12 @@ export async function listDocumentationFiles(
       throw new Error(`GitHub API error: ${response.status} ${response.statusText}`);
     }
 
-    const data = await response.json();
+    const data: GitHubContentItem[] = await response.json();
 
     // Filter for markdown files only and extract filenames
     return data
-      .filter((item: any) => item.type === 'file' && item.name.endsWith('.md'))
-      .map((item: any) => item.name);
+      .filter((item: GitHubContentItem) => item.type === 'file' && item.name.endsWith('.md'))
+      .map((item: GitHubContentItem) => item.name);
   } catch (error) {
     console.error(`Error listing documentation files: ${error}`);
     throw error;

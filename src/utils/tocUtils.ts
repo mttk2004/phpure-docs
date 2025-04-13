@@ -58,14 +58,6 @@ export function extractHeadingsFromMDX(content: string): HeadingInfo[] {
 export function extractHeadingsFromDOM(container?: Element): HeadingInfo[] {
   if (typeof document === 'undefined') return [];
 
-  // Target heading elements inside the provided container or any relevant content area
-  const selectors = [
-    '.mdx-content h2, .mdx-content h3', // For GitHub content
-    '.prose h2, .prose h3',             // For MDX content
-    'article h2, article h3',           // Generic fallback
-    'main h2, main h3'                  // Another fallback
-  ];
-
   // Find container element if not provided
   const targetContainer = container ||
     document.querySelector('.mdx-content') ||
