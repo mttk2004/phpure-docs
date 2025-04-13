@@ -55,43 +55,43 @@ export function extractHeadingsFromMDX(content: string): HeadingInfo[] {
  * Tạo TOC từ nội dung HTML đã được render
  * (fallback cho trường hợp không thể trích xuất từ MDX)
  */
-export function extractHeadingsFromDOM(): TocItem[] {
+export function extractHeadingsFromDOM(container?: Element): HeadingInfo[] {
   if (typeof document === 'undefined') return [];
 
-  // Tìm tất cả các heading h2, h3 trong phần nội dung
-  const headings = Array.from(document.querySelectorAll('.prose h2, .prose h3'));
+  // Target heading elements inside the provided container or any relevant content area
+  const selectors = [
+    '.mdx-content h2, .mdx-content h3', // For GitHub content
+    '.prose h2, .prose h3',             // For MDX content
+    'article h2, article h3',           // Generic fallback
+    'main h2, main h3'                  // Another fallback
+  ];
 
-  const toc: TocItem[] = [];
-  let currentH2Item: TocItem | null = null;
+  // Find container element if not provided
+  const targetContainer = container ||
+    document.querySelector('.mdx-content') ||
+    document.querySelector('.prose') ||
+    document.querySelector('article') ||
+    document;
 
-  headings.forEach((heading) => {
+  // Get all heading elements from the container
+  const headings = Array.from(targetContainer.querySelectorAll('h2, h3'));
+
+  // Process each heading
+  const headingInfos: HeadingInfo[] = headings.map((heading) => {
     const headingElement = heading as HTMLElement;
     const id = headingElement.id;
     const text = headingElement.textContent || '';
+    const level = parseInt(headingElement.tagName.charAt(1));
 
-    if (headingElement.tagName.toLowerCase() === 'h2') {
-      currentH2Item = {
-        title: text,
-        url: `#${id}`,
-        items: []
-      };
-      toc.push(currentH2Item);
-    } else if (headingElement.tagName.toLowerCase() === 'h3' && currentH2Item) {
-      currentH2Item.items?.push({
-        title: text,
-        url: `#${id}`
-      });
-    }
+    return {
+      level,
+      text,
+      id: id || toKebabCase(text) // Use existing ID or generate one
+    };
   });
 
-  // Xóa thuộc tính items nếu trống
-  toc.forEach((item) => {
-    if (item.items?.length === 0) {
-      delete item.items;
-    }
-  });
-
-  return toc;
+  console.log('Extracted headings from DOM:', headingInfos.length, headingInfos);
+  return headingInfos;
 }
 
 /**
