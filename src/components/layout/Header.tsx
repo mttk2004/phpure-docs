@@ -3,9 +3,10 @@ import { Menu, X, Moon, Sun, Github, Languages } from 'lucide-react';
 import { useTheme } from '@/hooks/useTheme';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { GITHUB_RELEASES_URL, GITHUB_STAR_URL } from '@/utils';
 import { useTranslation } from 'react-i18next';
+
 interface HeaderProps {
   isSidebarOpen: boolean;
   onMenuClick: () => void;
@@ -17,6 +18,30 @@ export default function Header({ isSidebarOpen, onMenuClick }: HeaderProps) {
   const { toggleLanguage, isVietnamese } = useLanguage();
   const [themeAnimating, setThemeAnimating] = useState(false);
   const [langAnimating, setLangAnimating] = useState(false);
+  const savedScrollPosition = useRef<number | null>(null);
+  const isLanguageChanging = useRef<boolean>(false);
+
+  // Lắng nghe sự kiện content-rendered để khôi phục vị trí cuộn sau khi nội dung đã tải xong
+  useEffect(() => {
+    const handleContentRendered = () => {
+      if (isLanguageChanging.current && savedScrollPosition.current !== null) {
+        console.log('Content rendered, restoring scroll position to:', savedScrollPosition.current);
+        window.scrollTo({
+          top: savedScrollPosition.current,
+          behavior: 'instant'
+        });
+        savedScrollPosition.current = null;
+        isLanguageChanging.current = false;
+        setLangAnimating(false);
+      }
+    };
+
+    window.addEventListener('content-rendered', handleContentRendered);
+
+    return () => {
+      window.removeEventListener('content-rendered', handleContentRendered);
+    };
+  }, []);
 
   const handleThemeToggle = () => {
     setThemeAnimating(true);
@@ -25,9 +50,26 @@ export default function Header({ isSidebarOpen, onMenuClick }: HeaderProps) {
   };
 
   const handleLanguageToggle = () => {
+    // Lưu lại vị trí cuộn hiện tại trước khi chuyển ngôn ngữ
+    savedScrollPosition.current = window.scrollY;
+    isLanguageChanging.current = true;
+
     setLangAnimating(true);
     toggleLanguage();
-    setTimeout(() => setLangAnimating(false), 300);
+
+    // Đặt một timeout dự phòng để xử lý trường hợp sự kiện content-rendered không được kích hoạt
+    setTimeout(() => {
+      if (isLanguageChanging.current && savedScrollPosition.current !== null) {
+        console.log('Fallback: restoring scroll position after timeout');
+        window.scrollTo({
+          top: savedScrollPosition.current,
+          behavior: 'instant'
+        });
+        savedScrollPosition.current = null;
+        isLanguageChanging.current = false;
+        setLangAnimating(false);
+      }
+    }, 2000); // Tăng thời gian chờ lên 2 giây để đảm bảo nội dung đã được tải
   };
 
   return (

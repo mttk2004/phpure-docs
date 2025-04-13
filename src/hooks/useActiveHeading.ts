@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface TocItem {
   title: string;
@@ -23,6 +23,7 @@ export function useActiveHeading(
   }
 ) {
   const [activeId, setActiveId] = useState<string>('');
+  const headingElementsRef = useRef<{id: string, top: number}[]>([]);
 
   useEffect(() => {
     if (!toc || toc.length === 0) return;
@@ -42,6 +43,40 @@ export function useActiveHeading(
         }
       });
     });
+
+    // Lưu trữ các phần tử heading và vị trí của chúng
+    headingElementsRef.current = headingIds
+      .map(id => {
+        const element = document.getElementById(id);
+        if (element) {
+          return {
+            id,
+            top: element.getBoundingClientRect().top + window.scrollY
+          };
+        }
+        return null;
+      })
+      .filter(item => item !== null) as {id: string, top: number}[];
+
+    // Xác định heading active dựa trên vị trí cuộn hiện tại
+    const findActiveHeading = () => {
+      if (headingElementsRef.current.length === 0) return;
+
+      // Lấy vị trí cuộn hiện tại + một offset nhỏ để ưu tiên heading phía trên
+      const scrollPosition = window.scrollY + 150;
+
+      // Tìm heading gần nhất phía trên vị trí cuộn
+      for (let i = headingElementsRef.current.length - 1; i >= 0; i--) {
+        const current = headingElementsRef.current[i];
+        if (current.top <= scrollPosition) {
+          setActiveId(current.id);
+          return;
+        }
+      }
+
+      // Nếu không tìm thấy heading nào, sử dụng heading đầu tiên
+      setActiveId(headingElementsRef.current[0].id);
+    };
 
     // Callback khi có element nào đó đi vào viewport
     const observerCallback: IntersectionObserverCallback = (entries) => {
@@ -65,13 +100,38 @@ export function useActiveHeading(
       }
     });
 
-    // Xử lý trường hợp khi trang vừa tải hoặc không có phần tử nào được observe
-    if (headingIds.length > 0) {
-      const firstElement = document.getElementById(headingIds[0]);
-      if (firstElement && window.scrollY < 200) {
-        setActiveId(headingIds[0]);
-      }
-    }
+    // Ngay sau khi tạo observer, xác định heading active dựa trên vị trí cuộn hiện tại
+    findActiveHeading();
+
+    // Thêm sự kiện lắng nghe cuộn trang
+    const handleScroll = () => {
+      findActiveHeading();
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    // Thêm lắng nghe sự kiện content-rendered để cập nhật active heading
+    const handleContentRendered = () => {
+      setTimeout(() => {
+        // Cập nhật lại vị trí của các heading sau khi nội dung thay đổi
+        headingElementsRef.current = headingIds
+          .map(id => {
+            const element = document.getElementById(id);
+            if (element) {
+              return {
+                id,
+                top: element.getBoundingClientRect().top + window.scrollY
+              };
+            }
+            return null;
+          })
+          .filter(item => item !== null) as {id: string, top: number}[];
+
+        findActiveHeading();
+      }, 100);
+    };
+
+    window.addEventListener('content-rendered', handleContentRendered);
 
     // Cleanup
     return () => {
@@ -82,8 +142,10 @@ export function useActiveHeading(
         }
       });
       observer.disconnect();
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('content-rendered', handleContentRendered);
     };
-  }, [toc, options.rootMargin, options.threshold]);
+  }, [toc, options]);
 
   return activeId;
 }
