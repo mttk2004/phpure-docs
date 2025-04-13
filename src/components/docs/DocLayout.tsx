@@ -94,7 +94,7 @@ export default function DocLayout({
           {editPath && (
             <div className="flex justify-start mt-6 sm:mt-10 md:mt-16">
               <a
-                href={`${GITHUB_REPO_URL}/edit/main${editPath}`}
+                href={`${GITHUB_REPO_URL}/edit/main/${editPath}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"

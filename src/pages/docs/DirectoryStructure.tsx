@@ -1,19 +1,25 @@
 import DocLayout from '@/components/docs/DocLayout';
-import { useMDXMeta } from '@/components/docs/MDXProvider';
-import DynamicMDX from '@/components/docs/DynamicMDX';
 import { useToc } from '@/hooks';
 import { useTranslation } from 'react-i18next';
 import SEO from '@/components/common/SEO';
 import { useLanguage } from '@/contexts/LanguageContext';
+import GithubDocContent from '@/components/docs/GithubDocContent';
+import { useState, useEffect } from 'react';
+import { CURRENT_DOC_VERSION } from '@/utils/githubUtils';
 
 export default function DirectoryStructure() {
-  const meta = useMDXMeta('directory-structure');
-  const { toc } = useToc('directory-structure');
+  const { toc } = useToc('directory-structure', true, CURRENT_DOC_VERSION);
   const { t } = useTranslation();
   const { language } = useLanguage();
+  const [title, setTitle] = useState<string>("Directory Structure");
+
+  useEffect(() => {
+    // Set title based on language
+    setTitle(language === 'vi' ? 'Cấu trúc thư mục' : 'Directory Structure');
+  }, [language]);
 
   const prev = {
-    title: t('navigation.getting-started'),
+    title: t('navigation.core-concepts'),
     href: "/docs/core-concepts"
   };
 
@@ -25,27 +31,29 @@ export default function DirectoryStructure() {
   return (
     <>
       <SEO
-        title={meta?.title || "Cấu trúc thư mục"}
-        description={meta?.description || "Tìm hiểu cấu trúc thư mục của PHPure framework"}
-        keywords={meta?.keywords?.toString() || "PHP, framework, PHPure, directory structure, folders"}
+        title={title}
+        description={language === 'vi' ?
+          "Tìm hiểu cấu trúc thư mục của PHPure framework" :
+          "Learn about the directory structure of PHPure framework"}
+        keywords={"PHP, framework, PHPure, directory structure, folders"}
         slug={`docs/directory-structure`}
         type="article"
         article={{
-          publishedTime: meta?.publishedAt as string,
-          modifiedTime: meta?.updatedAt as string,
+          publishedTime: new Date().toISOString(),
+          modifiedTime: new Date().toISOString(),
           section: "Docs",
           tags: ["PHPure", "Framework", "Directory Structure", "Organization"]
         }}
       />
 
       <DocLayout
-        title={meta?.title || "Cấu trúc thư mục"}
+        title={title}
         prev={prev}
         next={next}
-        editPath={`/content/${language}/directory-structure.mdx`}
+        editPath={`docs/${CURRENT_DOC_VERSION}/${language}/directory-structure.md`}
         toc={toc}
       >
-        <DynamicMDX contentKey="directory-structure" />
+        <GithubDocContent filename="directory-structure.md" version={CURRENT_DOC_VERSION} />
       </DocLayout>
     </>
   );

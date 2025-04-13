@@ -2,49 +2,98 @@ import { useState, useEffect, useRef } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { TocItem } from '@/types';
 import { extractHeadingsFromMDX, generateTocFromHeadings, extractHeadingsFromDOM } from '@/utils';
+import { fetchDocumentation, CURRENT_DOC_VERSION } from '@/utils/githubUtils';
 
 /**
- * Hook để tự động tạo TOC từ nội dung MDX
+ * Extract headings from GitHub markdown content
+ *
+ * @param content The markdown content as a string
+ * @returns Array of headings with level information
  */
-export function useToc(contentKey: string): { toc: TocItem[]; isLoading: boolean } {
+function extractHeadingsFromMarkdown(content: string): { level: number; title: string }[] {
+  if (!content) return [];
+
+  // Match all headings (# Heading1, ## Heading2, etc)
+  const headingRegex = /^(#{1,6})\s+(.+?)$/gm;
+  const headings: { level: number; title: string }[] = [];
+
+  let match;
+  while ((match = headingRegex.exec(content)) !== null) {
+    const level = match[1].length;
+    const title = match[2].trim();
+    headings.push({ level, title });
+  }
+
+  return headings;
+}
+
+/**
+ * Hook to automatically generate TOC from content
+ * - For MDX content: extract from source code
+ * - For GitHub markdown: extract from markdown content
+ * - Fallback to DOM extraction when needed
+ */
+export function useToc(contentKey: string, isGitHubContent: boolean = false, version: string = CURRENT_DOC_VERSION): { toc: TocItem[]; isLoading: boolean } {
   const { language } = useLanguage();
   const [toc, setToc] = useState<TocItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const domExtractionAttempted = useRef(false);
 
-  // Lắng nghe sự kiện content-rendered để trích xuất TOC từ DOM khi nội dung đã được render hoàn tất
-  useEffect(() => {
-    function extractTocFromDOM() {
-      if (domExtractionAttempted.current || toc.length > 0) return;
-
-      domExtractionAttempted.current = true;
-      // Đợi một chút để đảm bảo MDX đã được render đầy đủ
-      setTimeout(() => {
-        const domToc = extractHeadingsFromDOM();
-        if (domToc.length > 0) {
-          setToc(domToc);
-        }
-      }, 500);
-    }
-
-    // Đăng ký sự kiện render hoàn tất (nếu được kích hoạt từ DynamicMDX)
-    window.addEventListener('content-rendered', extractTocFromDOM);
-
-    // Thiết lập timeout dự phòng để trích xuất DOM nếu không nhận sự kiện
-    const fallbackTimer = setTimeout(extractTocFromDOM, 1000);
-
-    return () => {
-      window.removeEventListener('content-rendered', extractTocFromDOM);
-      clearTimeout(fallbackTimer);
-    };
-  }, [toc]);
-
-  // Cố gắng trích xuất TOC từ nội dung MDX
   useEffect(() => {
     async function loadToc() {
       setIsLoading(true);
       domExtractionAttempted.current = false;
 
+      if (isGitHubContent) {
+        try {
+          // Try to get markdown content from GitHub with language preference
+          const filename = `${contentKey}.md`;
+
+          try {
+            // Try to get content with the current language
+            const content = await fetchDocumentation(filename, language, version);
+            const headings = extractHeadingsFromMarkdown(content);
+            const generatedToc = generateTocFromHeadings(headings);
+
+            if (generatedToc.length > 0) {
+              setToc(generatedToc);
+              setIsLoading(false);
+              return;
+            }
+          } catch (langError) {
+            console.log(`Error generating TOC from ${language} documentation: ${langError}`);
+
+            // Only try fallback if current language is not English
+            if (language !== 'en') {
+              try {
+                // Fallback to English if the current language failed
+                const fallbackContent = await fetchDocumentation(filename, 'en', version);
+                const headings = extractHeadingsFromMarkdown(fallbackContent);
+                const generatedToc = generateTocFromHeadings(headings);
+
+                if (generatedToc.length > 0) {
+                  setToc(generatedToc);
+                  setIsLoading(false);
+                  return;
+                }
+              } catch (fallbackError) {
+                console.error(`Error generating TOC from fallback English documentation: ${fallbackError}`);
+              }
+            }
+          }
+
+          // If we get here, both attempts failed or found no headings
+          setToc([]);
+        } catch (error) {
+          console.error(`Error generating TOC from GitHub markdown: ${error}`);
+          setToc([]);
+        } finally {
+          setIsLoading(false);
+        }
+        return;
+      }
+
+      // Original MDX processing logic
       try {
         // Thử tải nội dung với ngôn ngữ hiện tại
         const module = await import(`@/content/${language}/${contentKey}.mdx`);
@@ -59,20 +108,30 @@ export function useToc(contentKey: string): { toc: TocItem[]; isLoading: boolean
             if (generatedToc.length > 0) {
               setToc(generatedToc);
             } else {
-              // Nếu không thể trích xuất được headings từ source code,
-              // chúng ta sẽ dựa vào DOM extraction ở useEffect trên
-              console.log('No headings extracted from source, waiting for DOM extraction');
+              // Fall back to DOM extraction after render
+              setTimeout(() => {
+                if (!domExtractionAttempted.current) {
+                  extractFromDOM();
+                }
+              }, 500);
             }
-          } catch (parseError) {
-            console.error('Error parsing MDX source:', parseError);
-            // Dựa vào DOM extraction
+          } catch (error) {
+            console.error(`Error extracting headings from MDX source: ${error}`);
+            setTimeout(() => {
+              if (!domExtractionAttempted.current) {
+                extractFromDOM();
+              }
+            }, 500);
           }
         } else {
-          // Không thể trích xuất source code, sẽ dựa vào DOM extraction
-          console.log('Cannot extract source code, will use DOM extraction');
+          setTimeout(() => {
+            if (!domExtractionAttempted.current) {
+              extractFromDOM();
+            }
+          }, 500);
         }
-      } catch (primaryError) {
-        console.error(`Failed to generate TOC for ${contentKey} in ${language}:`, primaryError);
+      } catch (error) {
+        console.error(`Failed to load MDX for TOC: ${error}`);
 
         // Thử với ngôn ngữ khác nếu ngôn ngữ hiện tại không khả dụng
         const fallbackLang = language === 'vi' ? 'en' : 'vi';
@@ -96,8 +155,34 @@ export function useToc(contentKey: string): { toc: TocItem[]; isLoading: boolean
       }
     }
 
+    function extractFromDOM() {
+      domExtractionAttempted.current = true;
+      // Phương pháp 2: Trích xuất từ DOM
+      const articleElement = document.querySelector('.mdx-content');
+      if (articleElement) {
+        const headings = extractHeadingsFromDOM(articleElement);
+        const generatedToc = generateTocFromHeadings(headings);
+        if (generatedToc.length > 0) {
+          setToc(generatedToc);
+        }
+      }
+    }
+
+    // Đăng ký event listener để trích xuất TOC sau khi nội dung được render
+    const handleContentRendered = () => {
+      if (!domExtractionAttempted.current) {
+        extractFromDOM();
+      }
+    };
+
+    window.addEventListener('content-rendered', handleContentRendered);
+
     loadToc();
-  }, [contentKey, language]);
+
+    return () => {
+      window.removeEventListener('content-rendered', handleContentRendered);
+    };
+  }, [contentKey, language, isGitHubContent, version]);
 
   return { toc, isLoading };
 }

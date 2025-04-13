@@ -162,7 +162,7 @@ export function CodeBlock({
           style={codeStyle}
           customStyle={{
             margin: 0,
-            padding: '1rem',
+            padding: '.5rem',
             paddingTop: paddingTop,
             borderRadius: 0,
             fontSize: isMobile ? '0.8125rem' : '0.9375rem',

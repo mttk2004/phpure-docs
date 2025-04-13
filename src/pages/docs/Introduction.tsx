@@ -1,16 +1,22 @@
 import DocLayout from '@/components/docs/DocLayout';
-import { useMDXMeta } from '@/components/docs/MDXProvider';
-import DynamicMDX from '@/components/docs/DynamicMDX';
 import { useToc } from '@/hooks';
 import { useTranslation } from 'react-i18next';
 import SEO from '@/components/common/SEO';
 import { useLanguage } from '@/contexts/LanguageContext';
+import GithubDocContent from '@/components/docs/GithubDocContent';
+import { useState, useEffect } from 'react';
+import { CURRENT_DOC_VERSION } from '@/utils/githubUtils';
 
 export default function Introduction() {
-  const meta = useMDXMeta('introduction');
-  const { toc } = useToc('introduction');
+  const { toc } = useToc('introduction', true, CURRENT_DOC_VERSION);
   const { t } = useTranslation();
   const { language } = useLanguage();
+  const [title, setTitle] = useState<string>("Introduction");
+
+  useEffect(() => {
+    // Set title based on language
+    setTitle(language === 'vi' ? 'Giới thiệu' : 'Introduction');
+  }, [language]);
 
   const next = {
     title: t('navigation.getting-started'),
@@ -20,26 +26,28 @@ export default function Introduction() {
   return (
     <>
       <SEO
-        title={meta?.title || "Giới thiệu"}
-        description={meta?.description || "Tổng quan về PHPure framework và các tính năng chính"}
-        keywords={meta?.keywords?.toString() || "PHP, framework, MVC, PHPure"}
+        title={title}
+        description={language === 'vi' ?
+          "Tổng quan về PHPure framework và các tính năng chính" :
+          "Overview of the PHPure framework and its main features"}
+        keywords={"PHP, framework, MVC, PHPure"}
         slug={`docs/introduction`}
         type="article"
         article={{
-          publishedTime: meta?.publishedAt as string,
-          modifiedTime: meta?.updatedAt as string,
+          publishedTime: new Date().toISOString(),
+          modifiedTime: new Date().toISOString(),
           section: "Docs",
           tags: ["PHPure", "Framework", "Introduction"]
         }}
       />
 
       <DocLayout
-        title={meta?.title || "Giới thiệu"}
+        title={title}
         next={next}
-        editPath={`/content/${language}/introduction.mdx`}
+        editPath={`docs/${CURRENT_DOC_VERSION}/${language}/introduction.md`}
         toc={toc}
       >
-        <DynamicMDX contentKey="introduction" />
+        <GithubDocContent filename="introduction.md" version={CURRENT_DOC_VERSION} />
       </DocLayout>
     </>
   );
