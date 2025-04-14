@@ -8,7 +8,7 @@ import { useState, useEffect } from 'react';
 import { CURRENT_DOC_VERSION } from '@/utils/githubUtils';
 
 export default function GettingStarted() {
-  const { toc } = useToc('getting-started', true, CURRENT_DOC_VERSION);
+  const { toc } = useToc('getting-started', CURRENT_DOC_VERSION);
   const { t } = useTranslation();
   const { language } = useLanguage();
   const [title, setTitle] = useState<string>("Getting Started");

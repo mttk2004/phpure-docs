@@ -7,7 +7,6 @@ import tailwindcss from "@tailwindcss/vite"
 import { TanStackRouterVite } from '@tanstack/router-vite-plugin'
 import fs from 'fs'
 import { compression as viteCompression } from 'vite-plugin-compression2'
-import { splitVendorChunkPlugin } from 'vite'
 
 // Nội dung robots.txt mặc định
 const defaultRobotsTxt = `# PHPure Documentation Website - robots.txt
@@ -39,7 +38,6 @@ export default defineConfig({
     tsconfigPaths(),
     TanStackRouterVite(),
     viteCompression(),
-    splitVendorChunkPlugin(),
     tailwindcss(),
     // Thêm plugin nén gzip và brotli
     viteCompression({
@@ -119,7 +117,13 @@ export default defineConfig({
       },
     },
     rollupOptions: {
-      output: {},
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react/jsx-runtime'],
+          'tanstack-router': ['@tanstack/react-router'],
+          'mdx': ['@mdx-js/react']
+        }
+      },
     },
     chunkSizeWarningLimit: 1000,
     assetsInlineLimit: 4096,

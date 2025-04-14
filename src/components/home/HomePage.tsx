@@ -1,11 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { Link } from '@tanstack/react-router';
 import { ArrowRight, Github, Package, Zap, Code, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { CodeBlock } from '@/components/ui/CodeBlock';
+// import { CodeBlock } from '@/components/ui/CodeBlock';
 import { GITHUB_REPO_URL, GITHUB_STAR_URL } from '@/utils';
 import SEO from '@/components/common/SEO';
 import { useTheme } from '@/hooks/useTheme';
+
+// Sử dụng lazy loading cho CodeBlock để tối ưu kích thước bundle
+const CodeBlock = lazy(() => import('@/components/ui/CodeBlock').then(mod => ({ default: mod.CodeBlock })));
 
 const phpCodeExample = `<?php
 
@@ -148,16 +151,18 @@ export default function HomePage() {
                 </div>
 
                 <div className="w-[90vw] min-[380px]:w-[92vw] min-[450px]:w-[93vw] min-[520px]:w-[94vw]">
-                  <CodeBlock
-                    code={phpCodeExample}
-                    language="php"
-                    showLineNumbers={false}
-                    animatedCode={displayCode}
-                    isTypingComplete={typingComplete}
-                    skipAnimation={skipAnimation}
-                    showCopyButton={false}
-                    paddingTop='1rem'
-                  />
+                  <Suspense fallback={<div>Loading...</div>}>
+                    <CodeBlock
+                      code={phpCodeExample}
+                      language="php"
+                      showLineNumbers={false}
+                      animatedCode={displayCode}
+                      isTypingComplete={typingComplete}
+                      skipAnimation={skipAnimation}
+                      showCopyButton={false}
+                      paddingTop='1rem'
+                    />
+                  </Suspense>
                 </div>
               </div>
             </div>

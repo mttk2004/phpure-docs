@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { cn } from '@/lib/utils';
-import { CodeBlock } from '@/components/ui/CodeBlock';
+// import { CodeBlock } from '@/components/ui/CodeBlock';
 import { Link } from '@tanstack/react-router';
 import { useTheme } from '@/hooks/useTheme';
+
+// Sử dụng lazy loading cho CodeBlock để tối ưu kích thước bundle
+const CodeBlock = lazy(() => import('@/components/ui/CodeBlock').then(mod => ({ default: mod.CodeBlock })));
 
 interface MDXContentProps {
   children: React.ReactNode;
@@ -130,12 +133,14 @@ export const MDXComponents = {
 
     // Sử dụng CodeBlock cho cả inline code có chỉ định ngôn ngữ và code blocks
     return (
-      <CodeBlock
-        code={content}
-        language={language}
-        showLineNumbers={!isInlineCode} // Chỉ hiển thị số dòng cho code blocks
-        showCopyButton={!isInlineCode}  // Chỉ hiển thị nút copy cho code blocks
-      />
+      <Suspense fallback={<div>Loading...</div>}>
+        <CodeBlock
+          code={content}
+          language={language}
+          showLineNumbers={!isInlineCode} // Chỉ hiển thị số dòng cho code blocks
+          showCopyButton={!isInlineCode}  // Chỉ hiển thị nút copy cho code blocks
+        />
+      </Suspense>
     );
   },
   pre: ({ className, ...props }: React.HTMLAttributes<HTMLPreElement>) => {
@@ -169,12 +174,14 @@ export const MDXComponents = {
       }
 
       return (
-        <CodeBlock
-          code={code}
-          language={detectedLanguage}
-          showLineNumbers={true}
-          showCopyButton={true}
-        />
+        <Suspense fallback={<div>Loading...</div>}>
+          <CodeBlock
+            code={code}
+            language={detectedLanguage}
+            showLineNumbers={true}
+            showCopyButton={true}
+          />
+        </Suspense>
       );
     }
 
@@ -195,7 +202,7 @@ export const MDXComponents = {
   td: ({ className, ...props }: React.HTMLAttributes<HTMLTableCellElement>) => (
     <td className={cn("border border-border px-4 py-2 text-left", className)} {...props} />
   ),
-  a: ({ className, href, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
+  a: function A({ className, href, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement>) {
     const { theme } = useTheme();
 
     // Define theme-specific primary color class

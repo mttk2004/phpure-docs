@@ -9,7 +9,7 @@ import { CURRENT_DOC_VERSION } from '@/utils/githubUtils';
 
 export default function Features() {
   // Pass true for isGitHubContent and the current version for the version parameter
-  const { toc } = useToc('features', true, CURRENT_DOC_VERSION);
+  const { toc } = useToc('features', CURRENT_DOC_VERSION);
   const { t } = useTranslation();
   const { language } = useLanguage();
   const [title, setTitle] = useState<string>("Useful Features");

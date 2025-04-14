@@ -8,7 +8,7 @@ import { useState, useEffect } from 'react';
 import { CURRENT_DOC_VERSION } from '@/utils/githubUtils';
 
 export default function DirectoryStructure() {
-  const { toc } = useToc('directory-structure', true, CURRENT_DOC_VERSION);
+  const { toc } = useToc('directory-structure', CURRENT_DOC_VERSION);
   const { t } = useTranslation();
   const { language } = useLanguage();
   const [title, setTitle] = useState<string>("Directory Structure");
