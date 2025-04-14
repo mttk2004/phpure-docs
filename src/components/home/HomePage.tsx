@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { CodeBlock } from '@/components/ui/CodeBlock';
 import { GITHUB_REPO_URL, GITHUB_STAR_URL } from '@/utils';
 import SEO from '@/components/common/SEO';
-
+import { useTheme } from '@/hooks/useTheme';
 
 const phpCodeExample = `<?php
 
@@ -25,6 +25,11 @@ class HomeController extends Controller
 }`;
 
 export default function HomePage() {
+  const { theme } = useTheme();
+
+  // Define theme-specific primary color class
+  const primaryColorClass = theme === 'dark' ? 'text-primary-light' : 'text-primary';
+
   // State cho hiệu ứng typing
   const [displayCode, setDisplayCode] = useState('');
   const [typingComplete, setTypingComplete] = useState(false);
@@ -84,7 +89,7 @@ export default function HomePage() {
                 href={`${GITHUB_REPO_URL}/releases`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-primary hover:text-primary/80 transition-colors"
+                className={`${primaryColorClass} hover:${primaryColorClass}/80 transition-colors`}
               >
                 Xem chi tiết
               </a>
@@ -172,7 +177,7 @@ export default function HomePage() {
 
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             <div className="p-6 border rounded-lg bg-background border-border">
-              <div className="mb-4 inline-flex items-center justify-center w-12 h-12 rounded-md bg-primary/10 text-primary">
+              <div className={`mb-4 inline-flex items-center justify-center w-12 h-12 rounded-md bg-primary/10 ${primaryColorClass}`}>
                 <Zap className="h-6 w-6" />
               </div>
               <h3 className="mb-2 text-xl font-semibold">Hiệu suất cao</h3>
@@ -182,7 +187,7 @@ export default function HomePage() {
             </div>
 
             <div className="p-6 border rounded-lg bg-background border-border">
-              <div className="mb-4 inline-flex items-center justify-center w-12 h-12 rounded-md bg-primary/10 text-primary">
+              <div className={`mb-4 inline-flex items-center justify-center w-12 h-12 rounded-md bg-primary/10 ${primaryColorClass}`}>
                 <Package className="h-6 w-6" />
               </div>
               <h3 className="mb-2 text-xl font-semibold">Nhẹ nhàng</h3>
@@ -192,7 +197,7 @@ export default function HomePage() {
             </div>
 
             <div className="p-6 border rounded-lg bg-background border-border">
-              <div className="mb-4 inline-flex items-center justify-center w-12 h-12 rounded-md bg-primary/10 text-primary">
+              <div className={`mb-4 inline-flex items-center justify-center w-12 h-12 rounded-md bg-primary/10 ${primaryColorClass}`}>
                 <Code className="h-6 w-6" />
               </div>
               <h3 className="mb-2 text-xl font-semibold">Dễ học, dễ sử dụng</h3>

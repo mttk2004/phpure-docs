@@ -4,6 +4,8 @@ import { ArrowLeft, ArrowRight, Edit, ChevronRight } from 'lucide-react';
 import { GITHUB_REPO_URL } from '@/utils';
 import { useTranslation } from 'react-i18next';
 import { useActiveHeading, useScrollToHash, useScrollToElement } from '@/hooks';
+import { useTheme } from '@/hooks/useTheme';
+import { cn } from '@/lib/utils';
 
 interface DocNavItem {
   title: string;
@@ -35,6 +37,10 @@ export default function DocLayout({
   toc,
 }: DocLayoutProps) {
   const { t } = useTranslation();
+  const { theme } = useTheme();
+
+  // Define theme-specific primary color class
+  const primaryColorClass = theme === 'dark' ? 'text-primary-light' : 'text-primary';
 
   // Sử dụng custom hooks
   const activeId = useActiveHeading(toc);
@@ -71,7 +77,7 @@ export default function DocLayout({
                     <ArrowLeft className="h-4 w-4" />
                     <span className='text-sm'>{t('docs.previous')}</span>
                   </div>
-                  <span className="font-medium">{prev.title}</span>
+                  <span className={cn("font-medium", primaryColorClass)}>{prev.title}</span>
                 </Link>
               ) : <div />}
 
@@ -84,7 +90,7 @@ export default function DocLayout({
                     <span className='text-sm'>{t('docs.next')}</span>
                     <ArrowRight className="h-4 w-4" />
                   </div>
-                  <span className="font-medium">{next.title}</span>
+                  <span className={cn("font-medium", primaryColorClass)}>{next.title}</span>
                 </Link>
               )}
             </div>
@@ -121,11 +127,12 @@ export default function DocLayout({
                       <a
                         href={section.url}
                         onClick={(e) => scrollToElement(e, section.url)}
-                        className={`block transition-colors ${
+                        className={cn(
+                          "block transition-colors",
                           isSectionActive
-                            ? 'text-primary font-medium'
+                            ? `${primaryColorClass} font-medium`
                             : 'text-muted-foreground hover:text-foreground'
-                        }`}
+                        )}
                       >
                         {section.title}
                       </a>
@@ -142,11 +149,12 @@ export default function DocLayout({
                                 <a
                                   href={item.url}
                                   onClick={(e) => scrollToElement(e, item.url)}
-                                  className={`block transition-colors text-xs ${
+                                  className={cn(
+                                    "block transition-colors text-xs",
                                     isItemActive
-                                      ? 'text-primary font-medium'
+                                      ? `${primaryColorClass} font-medium`
                                       : 'text-muted-foreground hover:text-foreground'
-                                  }`}
+                                  )}
                                 >
                                   {item.title}
                                 </a>

@@ -2,6 +2,7 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import { CodeBlock } from '@/components/ui/CodeBlock';
 import { Link } from '@tanstack/react-router';
+import { useTheme } from '@/hooks/useTheme';
 
 interface MDXContentProps {
   children: React.ReactNode;
@@ -9,41 +10,19 @@ interface MDXContentProps {
 }
 
 export function MDXContent({ children, className }: MDXContentProps) {
+  const { theme } = useTheme();
+
+  // Define theme-specific primary color class
+  const primaryColorClass = theme === 'dark' ? 'text-primary-light' : 'text-primary';
+
   return (
     <div className={cn('mdx-content', className)}>
-      <div className="prose prose-zinc dark:prose-invert max-w-none
-        prose-headings:scroll-m-20
-        prose-headings:font-medium
-        prose-h1:text-3xl
-        prose-h1:font-bold
-        prose-h2:text-2xl
-        prose-h2:font-semibold
-        prose-h2:border-b
-        prose-h2:pb-2
-        prose-h2:border-border
-        prose-h3:text-xl
-        prose-h4:text-lg
-        prose-img:rounded-md
-        prose-a:text-primary
-        prose-a:no-underline
-        hover:prose-a:underline
-        prose-blockquote:border-l-primary
-        prose-blockquote:border-opacity-50
-        prose-blockquote:bg-muted
-        prose-blockquote:py-1
-        prose-blockquote:px-4
-        prose-blockquote:rounded-r-md
-        prose-pre:bg-muted
-        prose-pre:border
-        prose-pre:border-border
-        prose-pre:rounded-md
-        prose-code:bg-muted
-        prose-code:px-1.5
-        prose-code:py-0.5
-        prose-code:rounded-md
-        prose-code:text-sm
-        prose-code:before:content-none
-        prose-code:after:content-none">
+      <div className={cn(
+        'prose dark:prose-invert max-w-none',
+        'prose-headings:scroll-m-20 prose-headings:font-medium prose-h1:text-3xl prose-h1:font-bold prose-h2:text-2xl prose-h2:font-semibold prose-h2:border-b prose-h2:pb-2 prose-h2:border-border prose-h3:text-xl prose-h4:text-lg prose-img:rounded-md',
+        `prose-a:${primaryColorClass}`,
+        'prose-a:no-underline hover:prose-a:underline prose-blockquote:border-l-primary prose-blockquote:border-opacity-50 prose-blockquote:bg-muted prose-blockquote:py-1 prose-blockquote:px-4 prose-blockquote:rounded-r-md prose-pre:bg-muted prose-pre:border prose-pre:border-border prose-pre:rounded-md prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-code:text-sm prose-code:before:content-none prose-code:after:content-none'
+      )}>
         {children}
       </div>
     </div>
@@ -217,13 +196,18 @@ export const MDXComponents = {
     <td className={cn("border border-border px-4 py-2 text-left", className)} {...props} />
   ),
   a: ({ className, href, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
+    const { theme } = useTheme();
+
+    // Define theme-specific primary color class
+    const primaryColorClass = theme === 'dark' ? 'text-primary-light' : 'text-primary';
+
     // Kiểm tra nếu href là external link
     const isExternal = href?.startsWith('http') || href?.startsWith('https') || href?.startsWith('//');
 
     if (isExternal) {
       return (
         <a
-          className={cn("text-primary no-underline hover:underline", className)}
+          className={cn(`${primaryColorClass} no-underline hover:underline`, className)}
           href={href}
           target="_blank"
           rel="noopener noreferrer"
@@ -234,7 +218,7 @@ export const MDXComponents = {
 
     return (
       <Link
-        className={cn("text-primary no-underline hover:underline", className)}
+        className={cn(`${primaryColorClass} no-underline hover:underline`, className)}
         to={href || ''}
         {...props}
       />

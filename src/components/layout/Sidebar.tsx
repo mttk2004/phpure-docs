@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useTheme } from '@/hooks/useTheme';
 
 interface NavItem {
   title: {
@@ -92,8 +93,12 @@ const navItems: NavItem[] = [
 
 export default function Sidebar({ isOpen }: SidebarProps) {
   const { language } = useLanguage();
+  const { theme } = useTheme();
   const matches = useMatches();
   const currentPath = matches.length > 0 ? matches[matches.length - 1].pathname : '';
+
+  // Define theme-specific primary color class
+  const primaryColorClass = theme === 'dark' ? 'text-primary-light' : 'text-primary';
 
   // Lưu trạng thái mở/đóng của các mục có menu con - sử dụng ID ổn định hơn thay vì tiêu đề
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
@@ -172,15 +177,15 @@ export default function Sidebar({ isOpen }: SidebarProps) {
                   className={cn(
                     "group flex items-center justify-between px-4 py-3 text-sm font-medium rounded-md transition-colors w-full",
                     isActive
-                      ? "bg-primary/10 text-primary"
-                      : "text-foreground hover:bg-muted"
+                      ? "bg-primary/10"
+                      : "hover:bg-muted"
                   )}
-                  activeProps={{ className: "bg-primary/10 text-primary" }}
+                  activeProps={{ className: "bg-primary/10" }}
                 >
                   <span className="flex items-center gap-2 w-full">
                     {sectionTitle}
                     {section.isNew && (
-                      <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-primary/20 text-primary ml-auto translate-x-1">
+                      <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-primary/20 ${primaryColorClass} ml-auto translate-x-1`}>
                         {language === 'vi' ? 'Mới' : 'New'}
                       </span>
                     )}
@@ -193,14 +198,14 @@ export default function Sidebar({ isOpen }: SidebarProps) {
                   className={cn(
                     "flex items-center justify-between w-full px-4 py-3 text-sm font-medium rounded-md transition-colors",
                     hasActiveChild
-                      ? "bg-primary/10 text-primary"
-                      : "text-foreground hover:bg-muted"
+                      ? "bg-primary/10"
+                      : "hover:bg-muted"
                   )}
                 >
                   <span className="flex items-center gap-2 w-full">
                     {sectionTitle}
                     {section.isNew && (
-                      <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-primary/20 text-primary ml-auto -translate-x-1">
+                      <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-primary/20 ${primaryColorClass} ml-auto -translate-x-1`}>
                         {language === 'vi' ? 'Mới' : 'New'}
                       </span>
                     )}
@@ -244,7 +249,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
                               <div className="flex items-center justify-between">
                                 <span className={isItemActive ? "underline underline-offset-4" : ""}>{itemTitle}</span>
                                 {item.isNew && (
-                                  <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-primary/20 text-primary no-underline">
+                                  <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-primary/20 ${primaryColorClass} no-underline`}>
                                     {language === 'vi' ? 'Mới' : 'New'}
                                   </span>
                                 )}

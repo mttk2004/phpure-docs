@@ -21,6 +21,9 @@ export default function Header({ isSidebarOpen, onMenuClick }: HeaderProps) {
   const savedScrollPosition = useRef<number | null>(null);
   const isLanguageChanging = useRef<boolean>(false);
 
+  // Get theme-specific primary color class
+  const primaryColorClass = theme === 'dark' ? 'text-primary-light' : 'text-primary';
+
   // Lắng nghe sự kiện content-rendered để khôi phục vị trí cuộn sau khi nội dung đã tải xong
   useEffect(() => {
     const handleContentRendered = () => {
@@ -89,7 +92,7 @@ export default function Header({ isSidebarOpen, onMenuClick }: HeaderProps) {
             to="/"
             className="flex items-center gap-2 font-bold text-xl"
           >
-            <span className="text-primary font-bold">PHPure</span>
+            <span className={`${primaryColorClass} font-bold`}>PHPure</span>
           </Link>
         </div>
 
@@ -97,8 +100,8 @@ export default function Header({ isSidebarOpen, onMenuClick }: HeaderProps) {
           <nav className="hidden md:flex items-center gap-6 mr-4 font-medium">
             <Link
               to="/docs"
-              className="text-sm text-muted-foreground hover:text-primary transition-colors"
-              activeProps={{ className: "text-primary font-medium" }}
+              className={`text-sm text-muted-foreground hover:${primaryColorClass} transition-colors`}
+              activeProps={{ className: `${primaryColorClass} font-medium` }}
             >
               {t('navigation.documentation')}
             </Link>
@@ -106,13 +109,13 @@ export default function Header({ isSidebarOpen, onMenuClick }: HeaderProps) {
               href={GITHUB_RELEASES_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm text-muted-foreground hover:text-primary transition-colors"
+              className={`text-sm text-muted-foreground hover:${primaryColorClass} transition-colors`}
             >
               {t('navigation.releases')}
             </a>
             <a
               href="/contribute"
-              className="text-sm text-muted-foreground hover:text-primary transition-colors"
+              className={`text-sm text-muted-foreground hover:${primaryColorClass} transition-colors`}
             >
               {t('navigation.contribute')}
             </a>

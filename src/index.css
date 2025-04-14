@@ -3,6 +3,7 @@
 
 @theme {
   --color-primary: #0c83f2;
+  --color-primary-light: #55a8f6;
   --color-primary-dark: #085ca9;
   --color-primary-foreground: #fff;
   --color-secondary: #885bd6;
@@ -222,7 +223,7 @@
   .box-gradient {
     display: inline-block;
     background-image: linear-gradient(45deg, var(--primary), var(--accent));
-    padding: .2rem .4rem .4rem;
+    padding: 0 .4rem .4rem;
     border-radius: 0.15rem;
     position: relative;
     transform: rotate(-3deg) translateY(0.2rem);
