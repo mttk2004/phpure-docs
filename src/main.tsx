@@ -2,11 +2,14 @@ import { StrictMode } from 'react'
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 import { createRoot } from 'react-dom/client'
-import { ensureReactGlobals, createReactProxy } from './utils/reactDebug'
+import { ensureReactGlobals, createReactProxy, fixReactExports } from './utils/reactDebug'
 
 // Initialize React globals immediately before any other imports
 // This ensures React structure exists before any module tries to access it
 ensureReactGlobals();
+
+// Try to fix any React export issues
+fixReactExports();
 
 // Only use the proxy in development mode for performance reasons
 if (process.env.NODE_ENV !== 'production') {
@@ -25,6 +28,9 @@ if (typeof window !== 'undefined') {
 
   // Call ensureReactGlobals again after React assignment to verify structure
   ensureReactGlobals();
+
+  // Final check for React export issues
+  fixReactExports();
 }
 
 // Extend Window interface to add our preload helper
@@ -59,23 +65,27 @@ let root: ReturnType<typeof createRoot> | null = null;
 
 // Immediate render for better FCP
 const startRender = () => {
-  const container = document.getElementById('root')
-  if (container) {
-    root = createRoot(container)
-    root.render(
-      <StrictMode>
-        <App />
-      </StrictMode>,
-    )
+  try {
+    const container = document.getElementById('root')
+    if (container) {
+      root = createRoot(container)
+      root.render(
+        <StrictMode>
+          <App />
+        </StrictMode>,
+      )
 
-    // Set marker for first render completion
-    if ('performance' in window && 'mark' in performance) {
-      performance.mark('app-rendered')
-      // Check if the start mark exists before measuring
-      if (performance.getEntriesByName('app-start', 'mark').length > 0) {
-        performance.measure('app-startup-time', 'app-start', 'app-rendered')
+      // Set marker for first render completion
+      if ('performance' in window && 'mark' in performance) {
+        performance.mark('app-rendered')
+        // Check if the start mark exists before measuring
+        if (performance.getEntriesByName('app-start', 'mark').length > 0) {
+          performance.measure('app-startup-time', 'app-start', 'app-rendered')
+        }
       }
     }
+  } catch (err) {
+    console.error('[Render Error]', err);
   }
 }
 

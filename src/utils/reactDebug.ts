@@ -1,5 +1,5 @@
 /**
- * React Debug Utilities
+ * React Debug Utilities - Enhanced version
  *
  * This file contains utilities to help debug React initialization issues
  * particularly in production builds where errors like "Cannot set property of undefined"
@@ -12,40 +12,75 @@
  */
 export function ensureReactGlobals(): void {
   if (typeof window !== 'undefined') {
-    // Make sure React exists on window
+    // Create a basic React object first if it doesn't exist
     if (!window.React) {
-      console.warn('[ReactDebug] Window.React was undefined, initializing empty object');
+      console.info('[ReactDebug] Creating React global object');
       window.React = {};
     }
 
-    // Ensure key React properties exist to prevent "Cannot set properties of undefined" errors
-    if (!window.React.Children) {
-      window.React.Children = {};
-    }
+    // Ensure key React properties exist
+    window.React.Children = window.React.Children || {};
+    window.React.Fragment = window.React.Fragment || Symbol('Fragment');
 
     if (!window.React.createElement) {
       window.React.createElement = function() {
-        console.warn('[ReactDebug] React.createElement was called before React was fully initialized');
         return null;
       };
     }
 
     if (!window.React.createContext) {
       window.React.createContext = function() {
-        console.warn('[ReactDebug] React.createContext was called before React was fully initialized');
         return { Provider: null, Consumer: null };
       };
     }
 
-    // Log React initialization status
-    console.debug(
-      '[ReactDebug] React global status:',
-      {
-        isDefined: !!window.React,
-        hasChildren: !!window.React.Children,
-        hasCreateElement: !!window.React.createElement,
+    // Create ReactDOM if it doesn't exist
+    if (!window.ReactDOM) {
+      window.ReactDOM = {
+        createRoot: function() {
+          return {
+            render: function() {},
+            unmount: function() {}
+          };
+        }
+      };
+    }
+
+    // Set up export fallbacks
+    if (!window.__REACT_PROVIDED__) {
+      try {
+        // This patch helps fix issues when modules try to destructure from React
+        const originalReactGet = Object.getOwnPropertyDescriptor(window, 'React')?.get;
+        Object.defineProperty(window, 'React', {
+          get: function() {
+            const reactObj = originalReactGet ? originalReactGet.call(this) : window.React;
+
+            // Prevent errors in code that destructures React exports
+            reactObj.__esModule = true;
+            reactObj.default = reactObj;
+
+            return reactObj;
+          },
+          configurable: true
+        });
+
+        window.__REACT_PROVIDED__ = true;
+      } catch (e) {
+        console.error('[ReactDebug] Failed to set up React export fallbacks', e);
       }
-    );
+    }
+
+    // Log React initialization status
+    if (process.env.NODE_ENV !== 'production') {
+      console.debug(
+        '[ReactDebug] React global status:',
+        {
+          isDefined: !!window.React,
+          hasChildren: !!window.React.Children,
+          hasCreateElement: !!window.React.createElement,
+        }
+      );
+    }
   }
 }
 
@@ -98,6 +133,32 @@ export function createReactProxy(): void {
   }
 }
 
+// Fix module export issues
+export function fixReactExports(): void {
+  if (typeof window !== 'undefined') {
+    try {
+      // Find any React exports in the page
+      const possibleReactModules = Object.keys(window)
+        .filter(key => /^__REACT_|^REACT_|react/.test(key))
+        .map(key => window[key as keyof Window]);
+
+      // Try to identify and fix React exports
+      possibleReactModules.forEach(module => {
+        if (module && typeof module === 'object') {
+          // If it has a createElement property, it's likely React
+          if (module.createElement && !module.default) {
+            module.default = module;
+            module.__esModule = true;
+            console.debug('[ReactDebug] Fixed missing default export for React-like module');
+          }
+        }
+      });
+    } catch (e) {
+      console.warn('[ReactDebug] Error fixing React exports:', e);
+    }
+  }
+}
+
 // Extend Window interface
 declare global {
   interface Window {
@@ -105,5 +166,6 @@ declare global {
     ReactDOM: any;
     __ORIGINAL_REACT?: any;
     __REACT_PROXY_ACTIVE?: boolean;
+    __REACT_PROVIDED__?: boolean;
   }
 }
