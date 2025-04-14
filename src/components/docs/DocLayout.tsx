@@ -109,7 +109,7 @@ export default function DocLayout({
         {/* Mục lục */}
         {toc && toc.length > 0 && (
           <div className="hidden md:block relative">
-            <div className="fixed w-[200px] top-24 max-h-[calc(100vh-6rem)] overflow-auto pr-2">
+            <div className="fixed w-[200px] top-24 bottom-40 max-h-[calc(100vh-6rem)] overflow-auto pr-2">
               <h3 className="text-xs font-semibold uppercase mb-4">{t('docs.onThisPage')}</h3>
               <ul className="space-y-4 text-sm">
                 {toc.map((section, i) => {
