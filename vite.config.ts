@@ -136,25 +136,65 @@ export default defineConfig({
         );
       },
     },
+    // Plugin that injects a script to fix the react_production is undefined error
+    {
+      name: 'fix-react-production',
+      transformIndexHtml(html) {
+        return html.replace(
+          '</head>',
+          `<script>
+            // Ensure react_production exists to prevent the "react_production is undefined" error
+            if (typeof window.react_production === 'undefined') {
+              window.react_production = {};
+              console.log("[Vite Plugin] Created react_production placeholder");
+            }
+          </script>
+          </head>`
+        );
+      }
+    }
   ],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
+    dedupe: ['react', 'react-dom'], // Ensure only one copy of React is used
   },
   build: {
-    // Disable minification for easier debugging
-    minify: process.env.NODE_ENV === 'production' ? 'esbuild' : false,
-    // Use a more stable output configuration with fewer chunks
+    // Use the most conservative minification option
+    minify: process.env.NODE_ENV === 'production' ? 'terser' : false,
+    terserOptions: {
+      compress: {
+        drop_console: false, // Keep console logs during debugging
+        drop_debugger: false,
+        pure_getters: false,
+        keep_classnames: true,
+        keep_fnames: true, // Keep function names to avoid minification issues
+        passes: 1, // Use minimal passes
+        sequences: false, // Be conservative with optimizing sequences
+      },
+      mangle: {
+        keep_classnames: true,
+        keep_fnames: true, // Important to keep function names for React
+        module: false, // Don't mangle module-specific code
+        properties: false, // Don't mangle property names
+      },
+      format: {
+        comments: 'some', // Keep some comments
+        ecma: 2015, // Safer target
+      },
+    },
     rollupOptions: {
+      // Explicitly list React as an external dependency to avoid duplication
+      external: [],
       output: {
-        // Use simple chunk names without hashes for better predictability
-        entryFileNames: 'assets/[name].js',
-        chunkFileNames: 'assets/[name]-[hash].js',
-        assetFileNames: 'assets/[name].[ext]',
-        // Bundle React and ReactDOM together
         manualChunks: {
-          'react-vendor': ['react', 'react-dom', 'react-dom/client', 'scheduler', 'react/jsx-runtime'],
+          'vendor': [
+            'react',
+            'react-dom',
+            'react-dom/client',
+            'scheduler'
+          ],
           'ui-vendor': [
             '@tanstack/react-router',
             'framer-motion',
@@ -163,20 +203,37 @@ export default defineConfig({
           ],
           'syntax': ['react-syntax-highlighter'],
         },
+        inlineDynamicImports: false,
+        // More predictable chunk naming for better imports
+        entryFileNames: 'assets/[name].js',
+        chunkFileNames: 'assets/[name].[hash].js',
+        assetFileNames: 'assets/[name].[ext]',
       },
     },
-    // Generate sourcemaps for easier debugging
-    sourcemap: true,
-    // Other build options
-    assetsInlineLimit: 4096,
-    target: 'es2015',
+    // Use source maps during development only
+    sourcemap: process.env.NODE_ENV !== 'production',
+    target: 'es2015', // Use a more conservative target for wider compatibility
+    commonjsOptions: {
+      include: [/node_modules/],
+      transformMixedEsModules: true, // Important for React
+    }
   },
-  // Define environment variables
   define: {
+    // Define global constants to help with React's process.env checks
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production'),
+    // Ensure React's development checks are properly disabled in production
+    __DEV__: process.env.NODE_ENV !== 'production',
   },
   // Optimization options
   optimizeDeps: {
-    include: ['react', 'react-dom', 'react/jsx-runtime'],
+    include: ['react', 'react-dom', 'react-dom/client'],
+    esbuildOptions: {
+      define: {
+        global: 'globalThis' // Fix issues with global in some packages
+      },
+      // Less aggressive optimizations
+      treeShaking: false,
+      minify: false,
+    }
   },
 })

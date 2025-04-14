@@ -8,6 +8,9 @@
     <meta name="google-site-verification" content="7nq7RhtoVcqiZsU2S4c95sZhRDervDnQd6MqUB6yO5k" />
     <meta name="robots" content="index, follow" />
 
+    <!-- Load React preload script first - critical for preventing "react_production is undefined" errors -->
+    <script src="/preload-react.js"></script>
+
     <!-- Critical inline styles -->
     <style>
       :root {

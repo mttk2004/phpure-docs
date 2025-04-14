@@ -6,6 +6,15 @@
  * might occur due to module loading or initialization order problems.
  */
 
+// Import React và ReactDOM từ node_modules để có đúng kiểu dữ liệu
+import React from 'react';
+import * as ReactDOMClient from 'react-dom/client';
+import * as ReactDOMFull from 'react-dom';
+
+// Định nghĩa kiểu cho các bản sao tạm thời của React
+type ReactLike = Partial<typeof React>;
+// Loại bỏ khai báo không sử dụng: type ReactDOMLike = Partial<typeof ReactDOMFull & typeof ReactDOMClient>;
+
 /**
  * Initialize React global object with proper structure to prevent
  * "Cannot set properties of undefined" errors
@@ -15,35 +24,49 @@ export function ensureReactGlobals(): void {
     // Create a basic React object first if it doesn't exist
     if (!window.React) {
       console.info('[ReactDebug] Creating React global object');
-      window.React = {};
+      window.React = {} as typeof React;
     }
 
-    // Ensure key React properties exist
-    window.React.Children = window.React.Children || {};
-    window.React.Fragment = window.React.Fragment || Symbol('Fragment');
+    // Sử dụng non-null assertion và as để tránh TypeScript error
+    const reactObj = window.React as ReactLike;
 
-    if (!window.React.createElement) {
-      window.React.createElement = function() {
+    // Ensure key React properties exist using bracket notation để tránh read-only error
+    if (!reactObj.Children) {
+      // Sử dụng unknown thay vì any
+      (reactObj as Record<string, unknown>)['Children'] = {};
+    }
+
+    if (!reactObj.Fragment) {
+      (reactObj as Record<string, unknown>)['Fragment'] = Symbol('Fragment');
+    }
+
+    if (!reactObj.createElement) {
+      (reactObj as Record<string, unknown>)['createElement'] = function() {
         return null;
       };
     }
 
-    if (!window.React.createContext) {
-      window.React.createContext = function() {
-        return { Provider: null, Consumer: null };
+    if (!reactObj.createContext) {
+      // Bỏ generic T không sử dụng
+      (reactObj as Record<string, unknown>)['createContext'] = function() {
+        return {
+          Provider: null,
+          Consumer: null,
+          $$typeof: Symbol.for('react.context')
+        } as unknown;
       };
     }
 
     // Create ReactDOM if it doesn't exist
     if (!window.ReactDOM) {
       window.ReactDOM = {
-        createRoot: function() {
+        createRoot: function () {
           return {
-            render: function() {},
-            unmount: function() {}
+            render: function () { },
+            unmount: function () { }
           };
         }
-      };
+      } as unknown as typeof ReactDOMFull & typeof ReactDOMClient;
     }
 
     // Set up export fallbacks
@@ -90,7 +113,7 @@ export function ensureReactGlobals(): void {
  */
 export function createReactProxy(): void {
   if (typeof window !== 'undefined' && !window.__REACT_PROXY_ACTIVE) {
-    const originalReact = window.React || {};
+    const originalReact = window.React || {} as typeof React;
 
     // Save original React
     window.__ORIGINAL_REACT = originalReact;
@@ -126,7 +149,7 @@ export function createReactProxy(): void {
     });
 
     // Replace window.React with our proxy
-    window.React = reactProxy;
+    window.React = reactProxy as typeof React;
     window.__REACT_PROXY_ACTIVE = true;
 
     console.debug('[ReactDebug] Installed React proxy for debugging');
@@ -140,15 +163,20 @@ export function fixReactExports(): void {
       // Find any React exports in the page
       const possibleReactModules = Object.keys(window)
         .filter(key => /^__REACT_|^REACT_|react/.test(key))
-        .map(key => window[key as keyof Window]);
+        // Sử dụng cách chuyển đổi kiểu an toàn hơn
+        .map(key => {
+          const windowObj = window as unknown as Record<string, unknown>;
+          return windowObj[key];
+        });
 
       // Try to identify and fix React exports
       possibleReactModules.forEach(module => {
         if (module && typeof module === 'object') {
           // If it has a createElement property, it's likely React
-          if (module.createElement && !module.default) {
-            module.default = module;
-            module.__esModule = true;
+          const reactLikeModule = module as Record<string, unknown>;
+          if (reactLikeModule.createElement && !reactLikeModule.default) {
+            reactLikeModule.default = module;
+            reactLikeModule.__esModule = true;
             console.debug('[ReactDebug] Fixed missing default export for React-like module');
           }
         }
@@ -159,12 +187,13 @@ export function fixReactExports(): void {
   }
 }
 
-// Extend Window interface
+// Extend Window interface - phải tương thích với định nghĩa trong main.tsx
 declare global {
   interface Window {
-    React: any;
-    ReactDOM: any;
-    __ORIGINAL_REACT?: any;
+    // Sử dụng kiểu trùng với main.tsx
+    React: typeof React;
+    ReactDOM: typeof ReactDOMFull & typeof ReactDOMClient;
+    __ORIGINAL_REACT?: typeof React;
     __REACT_PROXY_ACTIVE?: boolean;
     __REACT_PROVIDED__?: boolean;
   }
