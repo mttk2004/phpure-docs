@@ -121,9 +121,52 @@ export default defineConfig({
         return html.replace(
           '</head>',
           `<script>
-            // Ensure React and ReactDOM are available globally before any other scripts load
-            window.React = window.React || {};
-            window.ReactDOM = window.ReactDOM || {};
+            // React initialization diagnostics
+            console.debug('[ReactInit] Starting React initialization - head script');
+
+            // Create placeholder React global with full structure to prevent "Cannot set property" errors
+            window.React = window.React || {
+              Children: {},
+              createContext: function() { return { Provider: null, Consumer: null }; },
+              createElement: function() { return null; },
+              cloneElement: function() { return null; },
+              Component: function(){},
+              memo: function(component) { return component; },
+              Fragment: Symbol('Fragment'),
+              Suspense: Symbol('Suspense'),
+              lazy: function(importer) { return {
+                $$typeof: Symbol('react.lazy'),
+                _payload: { _status: -1, _result: importer },
+                _init: function() {}
+              }; },
+              forwardRef: function(render) { return { render: render }; },
+              useRef: function() { return { current: null }; },
+              useState: function(initial) { return [initial, function(){}]; },
+              useEffect: function() {},
+              useContext: function() {},
+              version: 'pre-initialized'
+            };
+
+            // Create ReactDOM placeholder
+            window.ReactDOM = window.ReactDOM || {
+              createRoot: function() {
+                return {
+                  render: function() {},
+                  unmount: function() {}
+                };
+              },
+              render: function() {},
+              version: 'pre-initialized'
+            };
+
+            // Detect when the real React is loaded
+            const originalDefineProperty = Object.defineProperty;
+            Object.defineProperty = function(obj, prop, descriptor) {
+              if (obj === window && (prop === 'React' || prop === 'ReactDOM')) {
+                console.debug('[ReactInit] React ' + prop + ' is being defined via Object.defineProperty');
+              }
+              return originalDefineProperty(obj, prop, descriptor);
+            };
 
             // Helper to preload assets
             window.__vite_preload_helper = function(url) {

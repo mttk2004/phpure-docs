@@ -1,13 +1,15 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PHPure Documentation</title>
+    <title>PHPure - Modern PHP Framework</title>
 
     <meta name="google-site-verification" content="7nq7RhtoVcqiZsU2S4c95sZhRDervDnQd6MqUB6yO5k" />
     <meta name="robots" content="index, follow" />
 
+    <!-- Preload React vendor chunk to ensure it loads first -->
+    <link rel="modulepreload" href="/assets/vendor-react" as="script" crossorigin="anonymous" />
     <!-- Preload & inline critical CSS để tránh FOUC (Flash Of Unstyled Content) -->
     <style>
       :root {
@@ -59,6 +61,8 @@
 
     <!-- Chỉ sử dụng preload cho critical font (Google font) -->
     <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Critical font preload -->
+    <link rel="preload" href="/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin />
   </head>
   <body>
     <div id="root"></div>
