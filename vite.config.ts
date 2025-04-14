@@ -169,6 +169,7 @@ export default defineConfig({
         properties: false, // Tránh minify các property name để tránh lỗi
         toplevel: true, // Better dead code elimination
         module: true,
+        keep_fnames: /^React|ReactDOM/, // Preserve React function names
       },
       format: {
         comments: false, // Loại bỏ tất cả comments
@@ -177,54 +178,68 @@ export default defineConfig({
     },
     rollupOptions: {
       output: {
-        manualChunks: (id) => {
-          // Simplified chunking strategy to prevent React initialization issues
+        manualChunks(id) {
+          // Create a single vendor bundle for all React-related code
           if (id.includes('node_modules')) {
-            // Keep all React and ReactDOM modules in the same chunk
             if (id.includes('react') ||
                 id.includes('scheduler') ||
                 id.includes('prop-types') ||
-                id.includes('object-assign')) {
-              return 'react-deps';
+                id.includes('object-assign') ||
+                id.includes('react-dom')) {
+              return 'vendor-react'; // Keep all React core in one chunk
             }
+
+            // Group major frameworks together
             if (id.includes('@tanstack/react-router') || id.includes('@tanstack/router')) {
-              return 'tanstack-router';
+              return 'vendor-router';
             }
+
+            // Group MDX dependencies
             if (id.includes('@mdx-js') || id.includes('mdx')) {
-              return 'mdx';
+              return 'vendor-mdx';
             }
+
+            // Icons are less critical and can be separate
             if (id.includes('lucide') || id.includes('icons')) {
-              return 'icons';
+              return 'vendor-icons';
             }
+
+            // Group internationalization
             if (id.includes('i18n') || id.includes('intl')) {
-              return 'i18n';
+              return 'vendor-i18n';
             }
+
+            // Group syntax highlighting
             if (id.includes('highlight') || id.includes('prism') || id.includes('syntax')) {
-              return 'syntax-highlight';
+              return 'vendor-syntax';
             }
-            // Split UI components into separate chunk
+
+            // All UI components should depend on React, not the other way around
             if (id.includes('ui') || id.includes('button') || id.includes('component')) {
-              return 'ui-components';
+              return 'app-ui';
             }
-            // Remaining libraries combined into vendor
-            return 'vendor';
+
+            // All other libraries
+            return 'vendor-other';
           }
 
-          // Group route components together for better code splitting
+          // Application code chunking
           if (id.includes('/src/pages/') || id.includes('/src/routes/')) {
-            return 'page-routes';
+            return 'app-routes';
           }
 
-          // Group layout components
           if (id.includes('/src/components/layout/')) {
-            return 'layouts';
+            return 'app-layout';
           }
+
+          return null; // Let other files follow default chunking
         },
         // Tối ưu tên file để cải thiện cache
         entryFileNames: 'assets/[name].[hash].js',
         chunkFileNames: 'assets/[name].[hash].js',
         assetFileNames: 'assets/[name].[hash].[ext]',
       },
+      preserveEntrySignatures: 'exports-only', // Improve tree shaking
     },
     chunkSizeWarningLimit: 1000,
     assetsInlineLimit: 4096, // Inline small assets to avoid additional requests
@@ -232,6 +247,10 @@ export default defineConfig({
     cssCodeSplit: true, // Tách CSS riêng cho mỗi chunk
     sourcemap: false, // Tắt sourcemap trong production
     reportCompressedSize: true, // Hiển thị kích thước sau khi nén
+  },
+  define: {
+    // Ensure proper React references
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production'),
   },
   optimizeDeps: {
     include: ['react', 'react-dom', '@tanstack/react-router'],

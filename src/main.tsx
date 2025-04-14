@@ -1,14 +1,24 @@
 import { StrictMode } from 'react'
+import * as React from 'react'
+import * as ReactDOM from 'react-dom'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import './styles/fonts.css'
 import App from './App.tsx'
 import '@/i18n/config'
 
+// Make React and ReactDOM available globally - important for production builds
+if (typeof window !== 'undefined') {
+  window.React = React;
+  window.ReactDOM = ReactDOM;
+}
+
 // Extend Window interface to add our preload helper
 declare global {
   interface Window {
     __vite_preload_helper: (url: string) => string;
+    React: typeof React;
+    ReactDOM: typeof ReactDOM;
   }
 }
 
