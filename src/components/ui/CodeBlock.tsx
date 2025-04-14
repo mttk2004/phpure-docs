@@ -1,17 +1,18 @@
 import { useTheme } from '@/hooks/useTheme';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus, vs } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { Copy, Check } from 'lucide-react';
 import { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Copy, Check } from 'lucide-react';
 import styles from './CodeBlock.module.css';
 
-// Preload và cache theme styles để tránh hiện tượng chớp
-const lightStyle = vs;
-const darkStyle = vscDarkPlus;
+// We'll use direct imports initially to avoid build errors
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus, vs } from 'react-syntax-highlighter/dist/esm/styles/prism';
+
+// Type definition for syntax highlighter styles
+type SyntaxStyle = Record<string, React.CSSProperties>;
 
 // Tùy chỉnh style cho hai theme
-const customizeStyle = (style, isDark, isMobile) => ({
+const customizeStyle = (style: SyntaxStyle, isDark: boolean, isMobile: boolean): SyntaxStyle => ({
   ...style,
   'code[class*="language-"]': {
     ...style['code[class*="language-"]'],
@@ -61,27 +62,26 @@ export function CodeBlock({
   const { theme } = useTheme();
 
   // Xác định theme dựa trên giá trị từ localStorage hoặc system preference
-  // Sử dụng useRef để lưu trữ giá trị ban đầu và tránh re-render
-  const initialTheme = useRef<'light' | 'dark'>(() => {
-    if (typeof window !== 'undefined') {
-      const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
-      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      return savedTheme === 'dark' || (!savedTheme && systemPrefersDark) ? 'dark' : 'light';
-    }
-    return 'light'; // SSR fallback
-  }).current;
+  const initialTheme = useRef<'light' | 'dark'>(
+    typeof window !== 'undefined'
+      ? (() => {
+          const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
+          const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          return savedTheme === 'dark' || (!savedTheme && systemPrefersDark) ? 'dark' : 'light';
+        })()
+      : 'light' // SSR fallback
+  ).current;
 
   const [isDarkTheme, setIsDarkTheme] = useState(initialTheme === 'dark');
   const [isMobile, setIsMobile] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const isFirstRender = useRef(true);
 
-  // Pre-optimize style caching để tránh tính toán lại khi chuyển đổi theme
-  const darkStyleCache = useRef(customizeStyle(darkStyle, true, isMobile));
-  const lightStyleCache = useRef(customizeStyle(lightStyle, false, isMobile));
+  // Pre-optimize style caching to avoid recalculation on theme switches
+  const darkStyleCache = useRef(customizeStyle(vscDarkPlus, true, isMobile));
+  const lightStyleCache = useRef(customizeStyle(vs, false, isMobile));
 
   // Sử dụng useLayoutEffect để áp dụng theme trước khi browser paint
-  // Điều này giúp ngăn chặn hiện tượng chớp
   useLayoutEffect(() => {
     if (typeof window !== 'undefined') {
       setIsDarkTheme(initialTheme === 'dark');
@@ -103,17 +103,16 @@ export function CodeBlock({
   useEffect(() => {
     if (theme && !isFirstRender.current) {
       // Chỉ cập nhật khi không phải lần render đầu tiên
-      // Điều này giúp tránh hiệu ứng chớp khi tải trang
       setIsDarkTheme(theme === 'dark');
     }
 
     isFirstRender.current = false;
   }, [theme]);
 
-  // Cập nhật style cache khi mobile state thay đổi
+  // Update style cache when mobile state changes
   useEffect(() => {
-    darkStyleCache.current = customizeStyle(darkStyle, true, isMobile);
-    lightStyleCache.current = customizeStyle(lightStyle, false, isMobile);
+    darkStyleCache.current = customizeStyle(vscDarkPlus, true, isMobile);
+    lightStyleCache.current = customizeStyle(vs, false, isMobile);
   }, [isMobile]);
 
   // Hàm xử lý sao chép mã
@@ -134,6 +133,28 @@ export function CodeBlock({
     ? (isTypingComplete || skipAnimation ? code : animatedCode)
     : code;
 
+  // Copy button component - extracted to reduce re-renders
+  const CopyButton = () => (
+    <button
+      type="button"
+      onClick={handleCopyCode}
+      className={`${styles.copyButton} ${copied ? styles.copyButtonSuccess : ''}`}
+      aria-label="Copy code"
+    >
+      {copied ? (
+        <>
+          <Check className="h-3 w-3" />
+          <span>{t("others.copiedCode")}</span>
+        </>
+      ) : (
+        <>
+          <Copy className="h-3 w-3" />
+          <span>{t("others.copyCode")}</span>
+        </>
+      )}
+    </button>
+  );
+
   return (
     <div
       className={`relative font-mono ${styles.codeContainer}`}
@@ -144,26 +165,7 @@ export function CodeBlock({
       }}
       data-theme={isDarkTheme ? 'dark' : 'light'}
     >
-      {showCopyButton && (
-        <button
-          type="button"
-          onClick={handleCopyCode}
-          className={`${styles.copyButton} ${copied ? styles.copyButtonSuccess : ''}`}
-          aria-label="Copy code"
-        >
-          {copied ? (
-            <>
-              <Check className="h-3 w-3" />
-              <span>{t("others.copiedCode")}</span>
-            </>
-          ) : (
-            <>
-              <Copy className="h-3 w-3" />
-              <span>{t("others.copyCode")}</span>
-            </>
-          )}
-        </button>
-      )}
+      {showCopyButton && <CopyButton />}
 
       <div
         className={`w-full ${isMobile ? styles.mobileContainer : ''}`}
@@ -194,10 +196,7 @@ export function CodeBlock({
             wordBreak: 'keep-all',
             wordSpacing: 'normal',
             textRendering: 'optimizeLegibility',
-            WebkitFontSmoothing: 'antialiased',
-            textSizeAdjust: '100%',
-            WebkitTextSizeAdjust: '100%',
-            MozTextSizeAdjust: '100%',
+            WebkitFontSmoothing: 'antialiased'
           }}
           wrapLines={true}
           wrapLongLines={false}
@@ -235,10 +234,7 @@ export function CodeBlock({
               whiteSpace: 'pre',
               tabSize: 4,
               MozTabSize: 4,
-              OTabSize: 4,
-              textSizeAdjust: '100%',
-              WebkitTextSizeAdjust: '100%',
-              MozTextSizeAdjust: '100%',
+              OTabSize: 4
             }
           }}
         >
@@ -252,12 +248,6 @@ export function CodeBlock({
           style={{ margin: '0 0 1rem 0' }}
         />
       )}
-
-      {/* Preload cả hai theme style để tránh chớp khi chuyển đổi */}
-      <div className="syntax-block-preload">
-        <div data-style="light"></div>
-        <div data-style="dark"></div>
-      </div>
     </div>
   );
 }

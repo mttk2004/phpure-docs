@@ -1,4 +1,27 @@
-/* Sử dụng system fonts cho code để giảm kích thước */
+/* Optimize font loading with font-display: swap */
+/* This allows text to be visible using fallback fonts while custom fonts load */
+
+/* System fonts stack for code - prioritizes fonts already installed on user's system */
 pre, code, .code-font {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  font-display: swap;
+  font-feature-settings: 'liga' 0; /* Disable ligatures for code to enhance readability */
+}
+
+/* Modern system font stack for body text - improves performance by using system fonts */
+body {
+  text-rendering: optimizeSpeed;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Size-adjust to minimize layout shifts between fallback and loaded fonts */
+.font-adjustment {
+  font-size-adjust: 100%;
+}
+
+/* Optimization for high-priority content - use this class on LCP text elements */
+.lcp-element {
+  content-visibility: auto;
+  contain-intrinsic-size: auto;
 }
