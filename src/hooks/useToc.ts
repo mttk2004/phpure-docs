@@ -34,7 +34,7 @@ function extractHeadingsFromMarkdown(content: string): { level: number; title: s
  * - For GitHub markdown: extract from markdown content
  * - Fallback to DOM extraction when needed
  */
-export function useToc(contentKey: string, isGitHubContent: boolean = true, version: string = CURRENT_DOC_VERSION): { toc: TocItem[]; isLoading: boolean } {
+export function useToc(contentKey: string, version: string = CURRENT_DOC_VERSION): { toc: TocItem[]; isLoading: boolean } {
   const { language } = useLanguage();
   const [toc, setToc] = useState<TocItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
