@@ -154,8 +154,8 @@
 /* Tùy chỉnh scrollbar */
 .codeContainer :global(pre)::-webkit-scrollbar,
 .codeContainer::-webkit-scrollbar {
-  height: 8px;
-  width: 8px;
+  height: 6px;
+  width: 6px;
 }
 
 .codeContainer :global(pre)::-webkit-scrollbar-track,
@@ -165,13 +165,13 @@
 
 .codeContainer :global(pre)::-webkit-scrollbar-thumb,
 .codeContainer::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 4px;
+  background: var(--scrollbar-thumb);
+  border-radius: 6px;
 }
 
 .codeContainer :global(pre)::-webkit-scrollbar-thumb:hover,
 .codeContainer::-webkit-scrollbar-thumb:hover {
-  background: var(--muted-foreground);
+  background: var(--scrollbar-thumb-hover);
 }
 
 /* Đảm bảo tab size trên tất cả các trình duyệt */

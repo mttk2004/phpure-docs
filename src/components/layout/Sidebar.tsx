@@ -156,7 +156,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
   return (
     <aside
       className={cn(
-        'fixed top-16 bottom-0 left-0 z-30 w-full max-w-72 overflow-y-auto border-r border-border bg-background/95 backdrop-blur-sm lg:translate-x-0 transition-transform duration-300 ease-in-out',
+        'fixed top-16 bottom-0 left-0 z-30 w-full max-w-72 overflow-y-auto border-r border-border bg-background/95 backdrop-blur-sm lg:translate-x-0 transition-transform duration-300 ease-in-out scrollbar-fancy',
         isOpen ? 'translate-x-0' : '-translate-x-full'
       )}
     >
