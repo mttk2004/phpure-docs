@@ -5,6 +5,19 @@
   overflow-x: hidden;
   transform: translateZ(0); /* Kích hoạt hardware acceleration */
   backface-visibility: hidden; /* Giúp tránh glitch khi thay đổi theme */
+  contain: paint; /* Cải thiện hiệu suất render */
+  content-visibility: auto; /* Tối ưu việc render khi ngoài viewport */
+  paint-order: normal;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Tránh hiện tượng chớp khi chuyển theme */
+.codeContainer[data-theme="light"] {
+  color-scheme: light;
+}
+
+.codeContainer[data-theme="dark"] {
+  color-scheme: dark;
 }
 
 .syntaxLine {
@@ -17,11 +30,13 @@
 .codeContainer :global(code),
 .codeContainer :global(span) {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+  transition-property: none !important; /* Ngăn tất cả transition */
 }
 
 /* Fix lỗi font-size cho token */
 .codeContainer :global(.token) {
   font-size: inherit !important;
+  transition-property: none !important; /* Ngăn transition cho token */
 }
 
 /* Fix cho line number */
@@ -77,7 +92,7 @@
 
 /* Thêm animation nhẹ cho token */
 .codeContainer :global(.token) {
-  transition: all 0.1s ease-in-out;
+  transition-property: none !important; /* Tắt mọi transition để ngăn hiện tượng chớp */
 }
 
 .syntaxLine:hover :global(.token) {
@@ -146,6 +161,7 @@
 /* Thêm hỗ trợ cho scroll ngang */
 .codeContainer {
   overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch; /* Cải thiện cuộn mượt trên iOS */
 }
 
 .codeContainer :global(pre) {
@@ -186,6 +202,9 @@
   tab-size: 4 !important;
   transform: translateZ(0); /* Giúp tránh glitch trên các phần tử con */
   will-change: contents; /* Cho trình duyệt biết rằng nội dung sẽ thay đổi */
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Đảm bảo tất cả indent được giữ nguyên */
@@ -220,4 +239,22 @@
 .mobileContainer :global(code) {
   max-width: 100% !important;
   white-space: pre !important;
+}
+
+/* Tạo layer mới để tối ưu hiệu suất render */
+.codeContainer,
+.codeContainer * {
+  contain: layout style paint;
+}
+
+/* Preload container styles - ngăn flash khi chuyển theme */
+.syntax-block-preload {
+  position: absolute;
+  display: block;
+  width: 0;
+  height: 0;
+  visibility: hidden;
+  overflow: hidden;
+  z-index: -1;
+  opacity: 0;
 }

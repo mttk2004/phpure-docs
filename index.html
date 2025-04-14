@@ -8,6 +8,49 @@
     <meta name="google-site-verification" content="7nq7RhtoVcqiZsU2S4c95sZhRDervDnQd6MqUB6yO5k" />
     <meta name="robots" content="index, follow" />
 
+    <!-- Preload & inline critical CSS để tránh FOUC (Flash Of Unstyled Content) -->
+    <style>
+      :root {
+        color-scheme: light dark;
+      }
+      body {
+        background-color: #edf6f9;
+        color: #181f30;
+      }
+      html.dark body {
+        background-color: #181f30;
+        color: #edf6f9;
+      }
+      /* Tránh hiệu ứng chớp khi chuyển theme */
+      .syntax-block-preload {
+        position: absolute;
+        width: 0;
+        height: 0;
+        visibility: hidden;
+        opacity: 0;
+        overflow: hidden;
+        z-index: -1;
+      }
+    </style>
+
+    <!-- Preload theme script để tránh FOUC -->
+    <script>
+      (function() {
+        // Lấy theme từ localStorage hoặc từ system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const theme = savedTheme || (systemDarkMode ? 'dark' : 'light');
+
+        // Áp dụng theme ngay lập tức để tránh flash
+        document.documentElement.classList.toggle('dark', theme === 'dark');
+
+        // Lưu theme vào localStorage nếu chưa có
+        if (!savedTheme) {
+          localStorage.setItem('theme', theme);
+        }
+      })();
+    </script>
+
     <!-- DNS prefetch và preconnect -->
     <link rel="dns-prefetch" href="https://fonts.googleapis.com">
     <link rel="dns-prefetch" href="https://fonts.gstatic.com">

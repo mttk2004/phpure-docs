@@ -2,9 +2,36 @@ import { useTheme } from '@/hooks/useTheme';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus, vs } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Copy, Check } from 'lucide-react';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './CodeBlock.module.css';
+
+// Preload và cache theme styles để tránh hiện tượng chớp
+const lightStyle = vs;
+const darkStyle = vscDarkPlus;
+
+// Tùy chỉnh style cho hai theme
+const customizeStyle = (style, isDark, isMobile) => ({
+  ...style,
+  'code[class*="language-"]': {
+    ...style['code[class*="language-"]'],
+    lineHeight: '1.6',
+    fontFamily: "'Roboto Mono Variable', monospace",
+    whiteSpace: 'pre',
+    fontSize: isMobile ? '0.8125rem' : '0.9375rem',
+    tabSize: 4,
+  },
+  'pre[class*="language-"]': {
+    ...style['pre[class*="language-"]'],
+    lineHeight: '1.6',
+    fontFamily: "'Roboto Mono Variable', monospace",
+    whiteSpace: 'pre',
+    overflow: 'auto',
+    fontSize: isMobile ? '0.8125rem' : '0.9375rem',
+    tabSize: 4,
+    backgroundColor: isDark ? 'hsl(222, 47%, 11%)' : 'hsl(190, 50%, 98%)',
+  }
+});
 
 interface CodeBlockProps {
   code: string;
@@ -14,7 +41,7 @@ interface CodeBlockProps {
   isTypingComplete?: boolean;
   skipAnimation?: boolean;
   showCopyButton?: boolean;
-  maxWidth?: string; // Thêm để kiểm soát độ rộng tối đa,
+  maxWidth?: string;
   paddingTop?: string
 }
 
@@ -29,18 +56,37 @@ export function CodeBlock({
   maxWidth,
   paddingTop = '2.5rem'
 }: CodeBlockProps) {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
   const { theme } = useTheme();
-  const [isDarkTheme, setIsDarkTheme] = useState(() => {
-    // Khởi tạo trạng thái theme ban đầu ngay khi component được tạo
-    // để tránh hiện tượng flash khi thay đổi theme sau khi render
-    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    return savedTheme === 'dark' || (!savedTheme && systemPrefersDark);
-  });
+
+  // Xác định theme dựa trên giá trị từ localStorage hoặc system preference
+  // Sử dụng useRef để lưu trữ giá trị ban đầu và tránh re-render
+  const initialTheme = useRef<'light' | 'dark'>(() => {
+    if (typeof window !== 'undefined') {
+      const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
+      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      return savedTheme === 'dark' || (!savedTheme && systemPrefersDark) ? 'dark' : 'light';
+    }
+    return 'light'; // SSR fallback
+  }).current;
+
+  const [isDarkTheme, setIsDarkTheme] = useState(initialTheme === 'dark');
   const [isMobile, setIsMobile] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const isFirstRender = useRef(true);
+
+  // Pre-optimize style caching để tránh tính toán lại khi chuyển đổi theme
+  const darkStyleCache = useRef(customizeStyle(darkStyle, true, isMobile));
+  const lightStyleCache = useRef(customizeStyle(lightStyle, false, isMobile));
+
+  // Sử dụng useLayoutEffect để áp dụng theme trước khi browser paint
+  // Điều này giúp ngăn chặn hiện tượng chớp
+  useLayoutEffect(() => {
+    if (typeof window !== 'undefined') {
+      setIsDarkTheme(initialTheme === 'dark');
+    }
+  }, [initialTheme]);
 
   // Kiểm tra kích thước màn hình
   useEffect(() => {
@@ -48,62 +94,39 @@ export function CodeBlock({
       setIsMobile(window.innerWidth < 768);
     };
 
-    // Kiểm tra khi component mount
     checkMobile();
-
-    // Thêm event listener để kiểm tra khi thay đổi kích thước màn hình
     window.addEventListener('resize', checkMobile);
-
-    // Cleanup
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Cập nhật trạng thái theme khi theme thay đổi từ hook useTheme
+  // Cập nhật theme khi có thay đổi
   useEffect(() => {
-    if (theme) {
+    if (theme && !isFirstRender.current) {
+      // Chỉ cập nhật khi không phải lần render đầu tiên
+      // Điều này giúp tránh hiệu ứng chớp khi tải trang
       setIsDarkTheme(theme === 'dark');
     }
+
+    isFirstRender.current = false;
   }, [theme]);
+
+  // Cập nhật style cache khi mobile state thay đổi
+  useEffect(() => {
+    darkStyleCache.current = customizeStyle(darkStyle, true, isMobile);
+    lightStyleCache.current = customizeStyle(lightStyle, false, isMobile);
+  }, [isMobile]);
 
   // Hàm xử lý sao chép mã
   const handleCopyCode = () => {
     navigator.clipboard.writeText(code);
     setCopied(true);
-
-    // Hiển thị tooltip thành công
-    setTimeout(() => {
-      setCopied(false);
-    }, 2000);
+    setTimeout(() => setCopied(false), 2000);
   };
 
-  // Xác định style dựa trên theme
-  let codeStyle = isDarkTheme ? vscDarkPlus : vs;
+  // Xác định style dựa trên theme hiện tại
+  const codeStyle = isDarkTheme ? darkStyleCache.current : lightStyleCache.current;
 
-  // Chuẩn hóa style để đồng nhất giữa các theme
-  codeStyle = {
-    ...codeStyle,
-    'code[class*="language-"]': {
-      ...codeStyle['code[class*="language-"]'],
-      lineHeight: '1.6',
-      fontFamily: "'Roboto Mono Variable', monospace",
-      // Không còn cho phép xuống dòng trên màn hình nhỏ
-      whiteSpace: 'pre',
-      fontSize: isMobile ? '0.8125rem' : '0.9375rem',
-      tabSize: 4,
-    },
-    'pre[class*="language-"]': {
-      ...codeStyle['pre[class*="language-"]'],
-      lineHeight: '1.6',
-      fontFamily: "'Roboto Mono Variable', monospace",
-      // Không còn cho phép xuống dòng trên màn hình nhỏ
-      whiteSpace: 'pre',
-      overflow: 'auto',
-      fontSize: isMobile ? '0.8125rem' : '0.9375rem',
-      tabSize: 4,
-    }
-  };
-
-  // Sử dụng màu nền phù hợp với theme của trang web
+  // Xác định màu nền phù hợp với theme
   const bgColor = isDarkTheme ? 'hsl(222, 47%, 11%)' : 'hsl(190, 50%, 98%)';
 
   // Xác định nội dung hiển thị (animated hoặc static)
@@ -119,6 +142,7 @@ export function CodeBlock({
         maxWidth: maxWidth || '100%',
         overflowX: isMobile ? 'hidden' : 'auto'
       }}
+      data-theme={isDarkTheme ? 'dark' : 'light'}
     >
       {showCopyButton && (
         <button
@@ -145,7 +169,7 @@ export function CodeBlock({
         className={`w-full ${isMobile ? styles.mobileContainer : ''}`}
         style={{
           maxWidth: '100%',
-          overflowX: 'auto' // Luôn cho phép scroll ngang
+          overflowX: 'auto'
         }}
       >
         <SyntaxHighlighter
@@ -159,35 +183,32 @@ export function CodeBlock({
             fontSize: isMobile ? '0.8125rem' : '0.9375rem',
             fontFamily: "'Roboto Mono Variable', monospace",
             backgroundColor: bgColor,
-            transition: 'background-color 0s', // Loại bỏ transition để tránh hiệu ứng chớp
+            transition: 'none', // Loại bỏ hoàn toàn transition để tránh chớp
             lineHeight: '1.6',
             maxWidth: '100%',
-            overflow: 'auto', // Luôn cho phép scroll
-            whiteSpace: 'pre', // Không cho phép xuống dòng
+            overflow: 'auto',
+            whiteSpace: 'pre',
             tabSize: 4,
             MozTabSize: 4,
             OTabSize: 4,
-            // Thêm các thuộc tính để ngăn code wrap
             wordBreak: 'keep-all',
             wordSpacing: 'normal',
             textRendering: 'optimizeLegibility',
             WebkitFontSmoothing: 'antialiased',
-            // Tùy chỉnh CSS cho cả mobile
-            textSizeAdjust: '100%', // Thêm để ngăn iOS thay đổi font size
-            WebkitTextSizeAdjust: '100%', // Cho Safari
-            MozTextSizeAdjust: '100%', // Cho Firefox
+            textSizeAdjust: '100%',
+            WebkitTextSizeAdjust: '100%',
+            MozTextSizeAdjust: '100%',
           }}
           wrapLines={true}
-          wrapLongLines={false} // Không ngắt dòng
+          wrapLongLines={false}
           lineProps={() => ({
             style: {
               display: 'block',
               lineHeight: '1.6',
-              whiteSpace: 'pre', // Không cho phép xuống dòng
+              whiteSpace: 'pre',
               tabSize: 4,
               MozTabSize: 4,
               OTabSize: 4,
-              // Thêm các thuộc tính để ngăn code wrap
               wordBreak: 'keep-all',
               wordSpacing: 'normal'
             },
@@ -202,8 +223,8 @@ export function CodeBlock({
             userSelect: 'none',
             fontFamily: "'Roboto Mono Variable', monospace",
             fontSize: isMobile ? '0.8125rem' : '0.9375rem',
-            fontStyle: 'normal', // Loại bỏ kiểu italic cho số dòng
-            opacity: 0.6, // Làm mờ số dòng
+            fontStyle: 'normal',
+            opacity: 0.6,
             lineHeight: '1.6'
           }}
           codeTagProps={{
@@ -211,13 +232,13 @@ export function CodeBlock({
               fontSize: isMobile ? '0.8125rem' : '0.9375rem',
               fontFamily: "'Roboto Mono Variable', monospace",
               lineHeight: '1.6',
-              whiteSpace: 'pre', // Không còn cho phép xuống dòng
+              whiteSpace: 'pre',
               tabSize: 4,
               MozTabSize: 4,
               OTabSize: 4,
-              textSizeAdjust: '100%', // Thêm để ngăn iOS thay đổi font size
-              WebkitTextSizeAdjust: '100%', // Cho Safari
-              MozTextSizeAdjust: '100%', // Cho Firefox
+              textSizeAdjust: '100%',
+              WebkitTextSizeAdjust: '100%',
+              MozTextSizeAdjust: '100%',
             }
           }}
         >
@@ -231,6 +252,12 @@ export function CodeBlock({
           style={{ margin: '0 0 1rem 0' }}
         />
       )}
+
+      {/* Preload cả hai theme style để tránh chớp khi chuyển đổi */}
+      <div className="syntax-block-preload">
+        <div data-style="light"></div>
+        <div data-style="dark"></div>
+      </div>
     </div>
   );
 }
