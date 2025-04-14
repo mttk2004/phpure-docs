@@ -1,7 +1,5 @@
 import { Routes } from './routes';
 import { LanguageProvider } from '@/contexts/LanguageContext';
-import { MDXProvider } from '@mdx-js/react';
-import { MDXComponents } from '@/components/docs/MDXContent';
 import { usePerformanceOptimizations } from '@/hooks/usePerformanceOptimizations';
 
 function App() {
@@ -9,11 +7,9 @@ function App() {
   usePerformanceOptimizations();
 
   return (
-    <MDXProvider components={MDXComponents}>
-      <LanguageProvider>
-        <Routes />
-      </LanguageProvider>
-    </MDXProvider>
+    <LanguageProvider>
+      <Routes />
+    </LanguageProvider>
   );
 }
 
