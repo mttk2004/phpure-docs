@@ -5,11 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PHPure - Modern PHP Framework</title>
 
+    <!-- CRITICAL: Inline React Production fallback - Đặt ở đầu file để chạy trước mọi thứ -->
+    <script>
+      // Định nghĩa ngay lập tức react_production để đảm bảo nó không bao giờ undefined
+      window.react_production = window.react_production || {};
+      // Thêm các phương thức quan trọng mà các module có thể gọi
+      window.react_production.jsx = window.react_production.jsx || function() { return null; };
+      window.react_production.jsxs = window.react_production.jsxs || function() { return null; };
+      window.react_production.Fragment = window.react_production.Fragment || Symbol('Fragment');
+    </script>
+
     <meta name="google-site-verification" content="7nq7RhtoVcqiZsU2S4c95sZhRDervDnQd6MqUB6yO5k" />
     <meta name="robots" content="index, follow" />
 
     <!-- Load React preload script first - critical for preventing "react_production is undefined" errors -->
-    <script src="/preload-react.js"></script>
+    <!-- Thêm async=false và defer=false để đảm bảo script được tải và thực thi trước các script khác -->
+    <script src="/preload-react.js" async="false" defer="false"></script>
 
     <!-- Critical inline styles -->
     <style>

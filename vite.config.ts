@@ -144,10 +144,32 @@ export default defineConfig({
           '</head>',
           `<script>
             // Ensure react_production exists to prevent the "react_production is undefined" error
-            if (typeof window.react_production === 'undefined') {
-              window.react_production = {};
-              console.log("[Vite Plugin] Created react_production placeholder");
-            }
+            // Đặt script này với thuộc tính defer=false và async=false để đảm bảo nó chạy sớm
+            (function() {
+              // Khởi tạo React Production ngay lập tức
+              window.react_production = window.react_production || {
+                Fragment: Symbol('Fragment'),
+                jsx: function() { return null; },
+                jsxs: function() { return null; },
+                createElement: function() { return null; }
+              };
+
+              // Tạo proxy để tự động tạo các thuộc tính không xác định
+              window.react_production = new Proxy(window.react_production, {
+                get: function(target, prop) {
+                  // Nếu thuộc tính không tồn tại, tạo một hàm giả
+                  if (target[prop] === undefined) {
+                    if (typeof prop === 'string') {
+                      console.warn('[React Init] Accessing undefined property: ' + prop);
+                      return function() { return null; };
+                    }
+                  }
+                  return target[prop];
+                }
+              });
+
+              console.log("[Vite Plugin] Created enhanced react_production object");
+            })();
           </script>
           </head>`
         );

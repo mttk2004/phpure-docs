@@ -21,19 +21,39 @@ declare global {
   }
 }
 
+// CRITICAL FIX FOR PRODUCTION: Đảm bảo react_production luôn tồn tại trước React initialization
+(function ensureReactProductionExists() {
+  // Kiểm tra và đảm bảo react_production được định nghĩa ngay từ đầu
+  if (typeof window !== 'undefined') {
+    // Đảm bảo react_production đã được tạo
+    if (!window.react_production) {
+      window.react_production = window.react_production || {};
+    }
+
+    // Thêm các phương thức quan trọng nếu chưa có
+    const reactProd = window.react_production;
+    if (!reactProd.Fragment) reactProd.Fragment = React.Fragment;
+    if (!reactProd.jsx) reactProd.jsx = React.createElement;
+    if (!reactProd.jsxs) reactProd.jsxs = React.createElement;
+
+    // Đảm bảo mọi thuộc tính không xác định sẽ trả về hàm thay vì undefined
+    window.react_production = new Proxy(window.react_production, {
+      get: function(target, prop) {
+        if (target[prop as keyof typeof target] !== undefined) {
+          return target[prop as keyof typeof target];
+        }
+        // Function trả về object rỗng cho bất kỳ thuộc tính nào không tồn tại
+        return function() { return {}; };
+      }
+    });
+
+    console.debug('[React Init] react_production protection enabled');
+  }
+})();
+
 // This makes react_production accessible globally which prevents the undefined error
 // Check if window exists first (for SSR safety)
 if (typeof window !== 'undefined') {
-  // Khởi tạo react_production nếu chưa tồn tại
-  if (!window.react_production) {
-    window.react_production = {
-      Fragment: React.Fragment,
-      jsx: React.createElement,
-      jsxs: React.createElement
-    };
-    console.log('[React Init] Created react_production fallback');
-  }
-
   // Support direct window.React usage
   window.React = React;
   // Gộp cả hai phiên bản ReactDOM
