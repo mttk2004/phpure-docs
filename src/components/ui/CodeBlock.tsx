@@ -32,10 +32,15 @@ export function CodeBlock({
   const { t } = useTranslation()
   const [copied, setCopied] = useState(false);
   const { theme } = useTheme();
-  const [isDarkTheme, setIsDarkTheme] = useState(false);
+  const [isDarkTheme, setIsDarkTheme] = useState(() => {
+    // Khởi tạo trạng thái theme ban đầu ngay khi component được tạo
+    // để tránh hiện tượng flash khi thay đổi theme sau khi render
+    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return savedTheme === 'dark' || (!savedTheme && systemPrefersDark);
+  });
   const [isMobile, setIsMobile] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [themeInitialized, setThemeInitialized] = useState(false);
 
   // Kiểm tra kích thước màn hình
   useEffect(() => {
@@ -53,25 +58,12 @@ export function CodeBlock({
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Cập nhật trạng thái theme khi theme thay đổi
+  // Cập nhật trạng thái theme khi theme thay đổi từ hook useTheme
   useEffect(() => {
-    // Chỉ cập nhật khi đã có giá trị theme từ hook
     if (theme) {
       setIsDarkTheme(theme === 'dark');
-      setThemeInitialized(true);
     }
   }, [theme]);
-
-  // Hiệu ứng tải trang - ẩn nội dung cho đến khi xác định được theme
-  useEffect(() => {
-    // Xác định theme từ localStorage hoặc system preference khi component mount
-    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const initialTheme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
-
-    setIsDarkTheme(initialTheme === 'dark');
-    setThemeInitialized(true);
-  }, []);
 
   // Hàm xử lý sao chép mã
   const handleCopyCode = () => {
@@ -125,8 +117,7 @@ export function CodeBlock({
       ref={containerRef}
       style={{
         maxWidth: maxWidth || '100%',
-        overflowX: isMobile ? 'hidden' : 'auto',
-        visibility: themeInitialized ? 'visible' : 'hidden'
+        overflowX: isMobile ? 'hidden' : 'auto'
       }}
     >
       {showCopyButton && (
@@ -168,7 +159,7 @@ export function CodeBlock({
             fontSize: isMobile ? '0.8125rem' : '0.9375rem',
             fontFamily: "'Roboto Mono Variable', monospace",
             backgroundColor: bgColor,
-            transition: 'all 0.2s ease-in-out',
+            transition: 'background-color 0s', // Loại bỏ transition để tránh hiệu ứng chớp
             lineHeight: '1.6',
             maxWidth: '100%',
             overflow: 'auto', // Luôn cho phép scroll

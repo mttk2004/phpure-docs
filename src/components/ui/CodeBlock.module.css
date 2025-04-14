@@ -3,6 +3,8 @@
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
   max-width: 100%;
   overflow-x: hidden;
+  transform: translateZ(0); /* Kích hoạt hardware acceleration */
+  backface-visibility: hidden; /* Giúp tránh glitch khi thay đổi theme */
 }
 
 .syntaxLine {
@@ -182,6 +184,8 @@
   -moz-tab-size: 4 !important;
   -o-tab-size: 4 !important;
   tab-size: 4 !important;
+  transform: translateZ(0); /* Giúp tránh glitch trên các phần tử con */
+  will-change: contents; /* Cho trình duyệt biết rằng nội dung sẽ thay đổi */
 }
 
 /* Đảm bảo tất cả indent được giữ nguyên */
