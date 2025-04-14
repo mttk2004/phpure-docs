@@ -37,7 +37,9 @@ export default defineConfig({
         plugins: [
           ['@babel/plugin-transform-react-jsx', { runtime: 'automatic' }]
         ]
-      }
+      },
+      // Ensure consistent React version
+      jsxRuntime: 'automatic',
     }),
     mdx({
       providerImportSource: '@mdx-js/react',
@@ -112,13 +114,17 @@ export default defineConfig({
         }
       }
     },
-    // Custom plugin to inject preload scripts into HTML
+    // Inject React globals into HTML before other scripts
     {
-      name: 'html-preload-injection',
+      name: 'inject-react-globals',
       transformIndexHtml(html) {
         return html.replace(
           '</head>',
           `<script>
+            // Ensure React and ReactDOM are available globally before any other scripts load
+            window.React = window.React || {};
+            window.ReactDOM = window.ReactDOM || {};
+
             // Helper to preload assets
             window.__vite_preload_helper = function(url) {
               const link = document.createElement('link');
@@ -172,10 +178,14 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: (id) => {
-          // Improved bundle chunking strategy
+          // Simplified chunking strategy to prevent React initialization issues
           if (id.includes('node_modules')) {
-            if (id.includes('react') || id.includes('scheduler') || id.includes('prop-types')) {
-              return 'react-vendor';
+            // Keep all React and ReactDOM modules in the same chunk
+            if (id.includes('react') ||
+                id.includes('scheduler') ||
+                id.includes('prop-types') ||
+                id.includes('object-assign')) {
+              return 'react-deps';
             }
             if (id.includes('@tanstack/react-router') || id.includes('@tanstack/router')) {
               return 'tanstack-router';
