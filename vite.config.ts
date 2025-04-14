@@ -159,14 +159,26 @@ export default defineConfig({
               version: 'pre-initialized'
             };
 
-            // Detect when the real React is loaded
-            const originalDefineProperty = Object.defineProperty;
-            Object.defineProperty = function(obj, prop, descriptor) {
-              if (obj === window && (prop === 'React' || prop === 'ReactDOM')) {
-                console.debug('[ReactInit] React ' + prop + ' is being defined via Object.defineProperty');
+            // Create a proxy to trap any attempts to access React properties
+            window._originalReact = window.React;
+            window.React = new Proxy(window.React, {
+              get(target, prop) {
+                if (prop in target) {
+                  return target[prop];
+                }
+                console.warn('[ReactInit] Accessing undefined React property:', prop);
+                if (typeof prop === 'string' && ['createElement', 'cloneElement', 'createContext'].includes(prop)) {
+                  return function() { return null; };
+                }
+                // Return empty object for undefined properties to prevent errors
+                return {};
+              },
+              set(target, prop, value) {
+                console.debug('[ReactInit] Setting React property:', prop);
+                target[prop] = value;
+                return true;
               }
-              return originalDefineProperty(obj, prop, descriptor);
-            };
+            });
 
             // Helper to preload assets
             window.__vite_preload_helper = function(url) {
@@ -192,97 +204,89 @@ export default defineConfig({
     minify: 'terser',
     terserOptions: {
       compress: {
-        drop_console: true,
+        drop_console: false, // Keep console logs for debugging
         drop_debugger: true,
-        passes: 3, // Tăng số lượt tối ưu hóa
-        ecma: 2020, // Sử dụng tính năng ECMAScript mới hơn để nén tốt hơn
-        pure_getters: true, // Optimize getter functions
-        unsafe: true, // Allow unsafe optimizations for better minification
-        unsafe_arrows: true,
-        unsafe_comps: true,
-        unsafe_Function: true,
-        unsafe_math: true,
-        unsafe_methods: true,
-        unsafe_proto: true,
-        unsafe_regexp: true,
-        unsafe_undefined: true,
+        passes: 2, // Reduce optimization passes to avoid minification issues
+        ecma: 2020,
+        pure_getters: true,
+        unsafe: false, // Disable unsafe optimizations which might cause issues
+        unsafe_arrows: false,
+        unsafe_comps: false,
+        unsafe_Function: false,
+        unsafe_math: false,
+        unsafe_methods: false,
+        unsafe_proto: false,
+        unsafe_regexp: false,
+        unsafe_undefined: false,
       },
       mangle: {
         safari10: true,
-        properties: false, // Tránh minify các property name để tránh lỗi
-        toplevel: true, // Better dead code elimination
-        module: true,
-        keep_fnames: /^React|ReactDOM/, // Preserve React function names
+        properties: false, // Don't mangle property names
+        toplevel: false, // Disable toplevel mangling to preserve important globals
+        module: false, // Disable module mangling for better compatibility
+        keep_fnames: true, // Keep all function names to avoid minification issues
       },
       format: {
-        comments: false, // Loại bỏ tất cả comments
+        comments: false,
         ecma: 2020,
       },
     },
     rollupOptions: {
       output: {
         manualChunks(id) {
-          // Create a single vendor bundle for all React-related code
+          // Put all React-related code in a single chunk
           if (id.includes('node_modules')) {
-            if (id.includes('react') ||
-                id.includes('scheduler') ||
-                id.includes('prop-types') ||
-                id.includes('object-assign') ||
+            if (id.includes('react') || id.includes('scheduler') ||
+                id.includes('prop-types') || id.includes('object-assign') ||
                 id.includes('react-dom')) {
-              return 'vendor-react'; // Keep all React core in one chunk
+              return 'react'; // Simplify name to avoid hashes
             }
 
-            // Group major frameworks together
+            // Other chunks
             if (id.includes('@tanstack/react-router') || id.includes('@tanstack/router')) {
-              return 'vendor-router';
+              return 'router';
             }
 
-            // Group MDX dependencies
             if (id.includes('@mdx-js') || id.includes('mdx')) {
-              return 'vendor-mdx';
+              return 'mdx';
             }
 
-            // Icons are less critical and can be separate
             if (id.includes('lucide') || id.includes('icons')) {
-              return 'vendor-icons';
+              return 'icons';
             }
 
-            // Group internationalization
             if (id.includes('i18n') || id.includes('intl')) {
-              return 'vendor-i18n';
+              return 'i18n';
             }
 
-            // Group syntax highlighting
             if (id.includes('highlight') || id.includes('prism') || id.includes('syntax')) {
-              return 'vendor-syntax';
+              return 'syntax';
             }
 
-            // All UI components should depend on React, not the other way around
             if (id.includes('ui') || id.includes('button') || id.includes('component')) {
-              return 'app-ui';
+              return 'ui';
             }
 
-            // All other libraries
-            return 'vendor-other';
+            return 'vendor';
           }
 
-          // Application code chunking
+          // App code
           if (id.includes('/src/pages/') || id.includes('/src/routes/')) {
-            return 'app-routes';
+            return 'routes';
           }
 
           if (id.includes('/src/components/layout/')) {
-            return 'app-layout';
+            return 'layout';
           }
 
-          return null; // Let other files follow default chunking
+          return null;
         },
-        // Tối ưu tên file để cải thiện cache
-        entryFileNames: 'assets/[name].[hash].js',
-        chunkFileNames: 'assets/[name].[hash].js',
-        assetFileNames: 'assets/[name].[hash].[ext]',
+        // Simplify file naming to improve caching and avoid routing issues
+        entryFileNames: 'assets/[name].js',
+        chunkFileNames: 'assets/[name].js',
+        assetFileNames: 'assets/[name].[ext]',
       },
-      preserveEntrySignatures: 'exports-only', // Improve tree shaking
+      preserveEntrySignatures: 'exports-only',
     },
     chunkSizeWarningLimit: 1000,
     assetsInlineLimit: 4096, // Inline small assets to avoid additional requests

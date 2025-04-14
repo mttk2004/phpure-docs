@@ -1,1 +1,5 @@
+# Serve asset files directly
+/assets/* /assets/:splat 200
+
+# Handle SPA routing
 /* /index.html 200
