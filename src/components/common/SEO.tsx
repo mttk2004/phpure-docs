@@ -29,7 +29,7 @@ export function SEO({
   const { t, i18n } = useTranslation();
   const currentLanguage = i18n.language;
   const siteName = 'PHPure Documentation';
-  const baseUrl = 'https://phpure-docs.example.com';
+  const baseUrl = 'https://phpure.netlify.app';
   const url = slug ? `${baseUrl}/${slug}` : ogUrl || baseUrl;
 
   const defaultDescription = t('seo.defaultDescription', 'Framework PHP nhẹ nhàng và mạnh mẽ dành cho ứng dụng hiện đại');

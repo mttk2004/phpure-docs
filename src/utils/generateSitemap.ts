@@ -8,7 +8,7 @@
 import fs from 'fs';
 import path from 'path';
 
-const BASE_URL = 'https://phpure-docs.example.com';
+const BASE_URL = 'https://phpure.netlify.app';
 
 interface Route {
   path: string;
