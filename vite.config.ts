@@ -31,6 +31,33 @@ Sitemap: https://phpure.netlify.app/sitemap.xml
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
+    // Plugin để đảm bảo React được khởi tạo sớm trong quá trình tải
+    {
+      name: 'ensure-react-initialized',
+      enforce: 'pre',
+      transformIndexHtml(html) {
+        return html.replace(
+          '</head>',
+          `<script>
+            // Very early React initialization - basic shell to prevent errors
+            window.React = window.React || {};
+            window.React.Children = window.React.Children || {
+              map: function(children, func, context) { return Array.isArray(children) ? children.map(func, context) : []; },
+              forEach: function(children, func, context) { Array.isArray(children) && children.forEach(func, context); },
+              count: function(children) { return Array.isArray(children) ? children.length : 0; },
+              only: function() { return null; },
+              toArray: function(children) { return Array.isArray(children) ? children : []; }
+            };
+            window.react_production = window.react_production || {};
+            window.react_production.jsx = window.react_production.jsx || function() { return null; };
+            window.react_production.jsxs = window.react_production.jsxs || function() { return null; };
+            window.react_production.Fragment = window.react_production.Fragment || Symbol('Fragment');
+            console.debug('[Vite Plugin] Created enhanced React and react_production objects');
+          </script>
+          </head>`
+        );
+      }
+    },
     react({
       // Improve React performance with automatic babel optimizations
       babel: {

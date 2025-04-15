@@ -1,8 +1,16 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Import React first to ensure it's initialized before anything else
 import React from 'react'
 // Import cả hai cách để phù hợp với kiểu dữ liệu
 import * as ReactDOMClient from 'react-dom/client'
 import * as ReactDOMFull from 'react-dom'
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import './index.css'
+import './styles/fonts.css'
+import App from './App.tsx'
+import '@/i18n/config'
 
 // Tạo interface đúng cho window mở rộng từ cả Window và typeof globalThis
 interface ReactProductionType {
@@ -18,117 +26,120 @@ declare global {
     React: typeof React;
     ReactDOM: typeof ReactDOMFull & typeof ReactDOMClient;
     react_production?: ReactProductionType;
+    __REACT_PRELOAD_ACTIVE?: boolean;
   }
 }
 
-// CRITICAL FIX FOR FIREFOX: Xử lý đặc biệt cho Firefox
-(function detectFirefoxAndFix() {
-  // Kiểm tra nếu đây là trình duyệt Firefox
-  const isFirefox = typeof navigator !== 'undefined' && navigator.userAgent.indexOf('Firefox') !== -1;
+// Kiểm tra xem preload script đã chạy chưa
+if (typeof window !== 'undefined' && !window.__REACT_PRELOAD_ACTIVE) {
+  console.warn('[Main] React preload script may not have executed correctly');
+}
 
-  if (isFirefox && typeof window !== 'undefined') {
-    console.debug('[React Init] Firefox detected, applying special fixes');
-
-    // 1. Tạo Object.defineProperty đặc biệt để đảm bảo react_production không bị undefined
-    type SafeReactProd = Record<string, unknown>;
-    let reactProdValue = window.react_production || {} as SafeReactProd;
-
-    // Tạo các phương thức cần thiết - sử dụng cast để tránh lỗi TypeScript
-    if (!reactProdValue.jsx) {
-      reactProdValue.jsx = React.createElement;
-    }
-
-    if (!reactProdValue.jsxs) {
-      reactProdValue.jsxs = React.createElement;
-    }
-
-    if (!reactProdValue.Fragment) {
-      reactProdValue.Fragment = React.Fragment;
-    }
-
-    try {
-      Object.defineProperty(window, 'react_production', {
-        configurable: true,
-        enumerable: true,
-        get: function() {
-          return reactProdValue;
-        },
-        set: function(newValue) {
-          if (newValue === undefined) {
-            console.warn('[React Init] Prevented Firefox from setting react_production to undefined');
-            return;
-          }
-          reactProdValue = newValue || reactProdValue;
-        }
-      });
-    } catch (e) {
-      console.error('[React Init] Firefox property definition error:', e);
-    }
-
-    // 2. Tạo một interval để liên tục kiểm tra và khôi phục react_production nếu nó bị undefined
-    const reactProdInterval = setInterval(() => {
-      if (!window.react_production) {
-        console.warn('[React Init] Restoring react_production in Firefox');
-        window.react_production = reactProdValue as ReactProductionType;
-      }
-    }, 50);
-
-    // Dừng interval sau 5 giây
-    setTimeout(() => {
-      clearInterval(reactProdInterval);
-    }, 5000);
-  }
-})();
-
-// CRITICAL FIX FOR PRODUCTION: Đảm bảo react_production luôn tồn tại trước React initialization
-(function ensureReactProductionExists() {
-  // Kiểm tra và đảm bảo react_production được định nghĩa ngay từ đầu
+// Universal browser fix - áp dụng cho mọi trình duyệt
+(function universalBrowserFix() {
   if (typeof window !== 'undefined') {
-    // Đảm bảo react_production đã được tạo
-    if (!window.react_production) {
-      window.react_production = window.react_production || {};
+    console.debug('[React Init] Running universal browser fixes');
+
+    // 1. Backup của React đối tượng ban đầu để tránh mất dữ liệu
+    const originalReact = window.React || {};
+    const originalReactDOM = window.ReactDOM || {}; // Thêm biến originalReactDOM
+    const originalReactProduction = window.react_production || {};
+
+    // 2. Tạo một reactive observer để theo dõi và khôi phục React object khi cần
+    try {
+      // Sử dụng MutationObserver để phát hiện thay đổi DOM
+      if (typeof MutationObserver === 'function') {
+        const reactObserver = new MutationObserver(function() {
+          // Khôi phục React.Children nếu nó bị mất
+          if (!window.React || !window.React.Children) {
+            console.debug('[React Init] Restoring React.Children');
+            window.React = {
+              ...window.React || {},
+              Children: originalReact.Children || {
+              map: function(children: React.ReactNode, func: (child: React.ReactNode, index: number) => any, context?: any) { return Array.isArray(children) ? children.map(func, context) : []; },
+              forEach: function(children: React.ReactNode, func: (child: React.ReactNode, index: number) => void, context?: any) { Array.isArray(children) && children.forEach(func, context); },
+              count: function(children: React.ReactNode) { return Array.isArray(children) ? children.length : 0; },
+              only: function() { return null; },
+              }
+            };
+          }
+
+          // Kiểm tra và khôi phục react_production nếu cần
+          if (!window.react_production) {
+            console.debug('[React Init] Restoring react_production');
+            window.react_production = originalReactProduction;
+          }
+
+          // Khôi phục ReactDOM nếu cần
+          if (!window.ReactDOM) {
+            console.debug('[React Init] Restoring ReactDOM');
+            window.ReactDOM = originalReactDOM;
+          }
+        });
+
+        // Bắt đầu giám sát DOM
+        reactObserver.observe(document.documentElement, {
+          childList: true,
+          subtree: true
+        });
+
+        // Giải phóng observer sau 10 giây để tránh ảnh hưởng đến hiệu suất
+        setTimeout(function() {
+          reactObserver.disconnect();
+        }, 10000);
+      }
+    } catch (e) {
+      console.error('[React Init] Error setting up observer:', e);
+    }
+    // 3. Đảm bảo mọi thuộc tính React cần thiết đều tồn tại
+    // Đảm bảo React.Children luôn tồn tại - vấn đề chính trên Chrome
+    if (!window.React.Children) {
+      window.React = {
+        ...window.React,
+        Children: originalReact.Children || {
+          map: function(children: React.ReactNode, func: (child: React.ReactNode, index: number) => any, context?: any) { return Array.isArray(children) ? children.map(func, context) : []; },
+          forEach: function(children: React.ReactNode, func: (child: React.ReactNode, index: number) => void, context?: any) { Array.isArray(children) && children.forEach(func, context); },
+          count: function(children: React.ReactNode) { return Array.isArray(children) ? children.length : 0; },
+          only: function() { return null; },
+          toArray: function(children: React.ReactNode) { return Array.isArray(children) ? children : []; }
+        }
+      };
     }
 
-    // Thêm các phương thức quan trọng nếu chưa có
-    const reactProd = window.react_production;
-    if (!reactProd.Fragment) reactProd.Fragment = React.Fragment;
-    if (!reactProd.jsx) reactProd.jsx = React.createElement;
-    if (!reactProd.jsxs) reactProd.jsxs = React.createElement;
+    // Đảm bảo react_production luôn tồn tại
+    window.react_production = window.react_production || originalReactProduction || {};
+    if (!window.react_production.jsx && window.React.createElement) window.react_production.jsx = window.React.createElement;
+    if (!window.react_production.jsxs && window.React.createElement) window.react_production.jsxs = window.React.createElement;
+    if (!window.react_production.Fragment && window.React.Fragment) window.react_production.Fragment = window.React.Fragment;
 
-    // Đảm bảo mọi thuộc tính không xác định sẽ trả về hàm thay vì undefined
-    window.react_production = new Proxy(window.react_production, {
+    // 4. Thêm Proxy để đảm bảo bất kỳ thuộc tính không xác định nào cũng sẽ trả về hàm thay vì undefined
+    // Sử dụng một biến trung gian để tránh lỗi TypeScript
+    const reactProduction = window.react_production;
+    window.react_production = new Proxy(reactProduction, {
       get: function(target, prop) {
-        if (target[prop as keyof typeof target] !== undefined) {
-          return target[prop as keyof typeof target];
+        const key = prop as string;
+        // Kiểm tra nếu thuộc tính tồn tại
+        if (key in target) {
+          return target[key];
         }
-        // Function trả về object rỗng cho bất kỳ thuộc tính nào không tồn tại
+        // Trả về hàm dummy nếu thuộc tính không tồn tại
         return function() { return {}; };
       }
     });
 
-    console.debug('[React Init] react_production protection enabled');
+    console.debug('[React Init] Universal browser fixes completed');
   }
 })();
 
-// This makes react_production accessible globally which prevents the undefined error
-// Check if window exists first (for SSR safety)
+// This makes React objects accessible globally
 if (typeof window !== 'undefined') {
-  // Support direct window.React usage
+  // Đảm bảo React và ReactDOM là đối tượng toàn cầu
   window.React = React;
-  // Gộp cả hai phiên bản ReactDOM
-  window.ReactDOM = { ...ReactDOMFull, ...ReactDOMClient } as typeof ReactDOMFull & typeof ReactDOMClient;
+  window.ReactDOM = { ...ReactDOMFull, ...ReactDOMClient } as unknown as typeof ReactDOMFull & typeof ReactDOMClient;
 }
 
-// Now import the rest of the application
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import './styles/fonts.css'
-import App from './App.tsx'
-import '@/i18n/config'
-
 // Initialize performance monitoring
-if ('performance' in window && 'mark' in performance) {
+if (typeof window !== 'undefined' && 'performance' in window && 'mark' in performance) {
   performance.mark('app-start')
 }
 
@@ -138,6 +149,8 @@ let root: ReturnType<typeof createRoot> | null = null;
 // Immediate render for better FCP
 const startRender = () => {
   try {
+    if (typeof window === 'undefined') return;
+
     const container = document.getElementById('root')
     if (container) {
       root = createRoot(container)

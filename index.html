@@ -5,9 +5,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PHPure - Modern PHP Framework</title>
 
-    <!-- CRITICAL: Inline React Production fallback - Đặt ở đầu file để chạy trước mọi thứ -->
+    <!-- CRITICAL: Universal React fix - phải đặt trước mọi script khác -->
     <script>
-      // Định nghĩa ngay lập tức react_production để đảm bảo nó không bao giờ undefined
+      // Khởi tạo đối tượng React một cách đầy đủ trước khi bất kỳ module nào được tải
+      (function initializeReact() {
+        window.React = window.React || {};
+
+        // Thêm các thuộc tính cốt lõi của React để tránh lỗi "Cannot set property of undefined"
+        window.React.Children = window.React.Children || {};
+        window.React.createRef = window.React.createRef || function() { return {current: null}; };
+        window.React.Component = window.React.Component || function() {};
+        window.React.PureComponent = window.React.PureComponent || function() {};
+        window.React.createContext = window.React.createContext || function() { return {}; };
+        window.React.Fragment = window.React.Fragment || Symbol('Fragment');
+        window.React.Suspense = window.React.Suspense || function() {};
+        window.React.createElement = window.React.createElement || function() { return {}; };
+        window.React.cloneElement = window.React.cloneElement || function() { return {}; };
+        window.React.createFactory = window.React.createFactory || function() { return function() {}; };
+        window.React.isValidElement = window.React.isValidElement || function() { return false; };
+        window.React.version = window.React.version || 'preload-script';
+        window.React.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED =
+          window.React.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED || {
+            ReactCurrentOwner: {current: null},
+            ReactCurrentDispatcher: {current: null}
+          };
+        window.React.default = window.React;
+        window.React.__esModule = true;
+
+        // Khởi tạo React Production
+        window.react_production = window.react_production || {};
+        window.react_production.jsx = window.react_production.jsx || function() { return {}; };
+        window.react_production.jsxs = window.react_production.jsxs || function() { return {}; };
+        window.react_production.Fragment = window.react_production.Fragment || Symbol('Fragment');
+
+        // Khởi tạo ReactDOM
+        window.ReactDOM = window.ReactDOM || {};
+        window.ReactDOM.render = window.ReactDOM.render || function() {};
+        window.ReactDOM.hydrate = window.ReactDOM.hydrate || function() {};
+        window.ReactDOM.createPortal = window.ReactDOM.createPortal || function() {};
+        window.ReactDOM.findDOMNode = window.ReactDOM.findDOMNode || function() { return null; };
+        window.ReactDOM.createRoot = window.ReactDOM.createRoot || function() {
+          return {
+            render: function() {},
+            unmount: function() {}
+          };
+        };
+        window.ReactDOM.version = window.ReactDOM.version || 'preload-script';
+        window.ReactDOM.default = window.ReactDOM;
+        window.ReactDOM.__esModule = true;
+
+        console.debug('[React Pre-Init] Initialized React global objects');
+      })();
+    </script>
+
+    <!-- Inline React Production fallback - as a fallback -->
+    <script>
+      // Định nghĩa react_production để đảm bảo nó không bao giờ undefined
       window.react_production = window.react_production || {};
       // Thêm các phương thức quan trọng mà các module có thể gọi
       window.react_production.jsx = window.react_production.jsx || function() { return null; };
