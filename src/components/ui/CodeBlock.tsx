@@ -188,8 +188,9 @@ export function CodeBlock({
             transition: 'none', // Loại bỏ hoàn toàn transition để tránh chớp
             lineHeight: '1.6',
             maxWidth: '100%',
-            overflow: 'auto !important', // Force enable scrolling with !important
-            overflowX: 'auto !important', // Explicitly set horizontal scrolling with !important
+            overflow: 'auto', // Force enable scrolling
+            overflowX: 'auto', // Explicitly set horizontal scrolling
+            WebkitOverflowScrolling: 'touch', // Better scrolling on iOS
             whiteSpace: 'pre',
             tabSize: 4,
             MozTabSize: 4,
