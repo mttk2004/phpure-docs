@@ -144,7 +144,7 @@ export default defineConfig({
           '</head>',
           `<script>
             // Ensure react_production exists to prevent the "react_production is undefined" error
-            // Đặt script này với thuộc tính defer=false và async=false để đảm bảo nó chạy sớm
+            // Đặt script này trực tiếp trong HTML để đảm bảo nó chạy sớm nhất có thể
             (function() {
               // Khởi tạo React Production ngay lập tức
               window.react_production = window.react_production || {
@@ -169,6 +169,46 @@ export default defineConfig({
               });
 
               console.log("[Vite Plugin] Created enhanced react_production object");
+            })();
+          </script>
+          </head>`
+        );
+      }
+    },
+    // Browser-specific fixes cho Firefox
+    {
+      name: 'firefox-specific-fixes',
+      transformIndexHtml(html) {
+        return html.replace(
+          '</head>',
+          `<script>
+            // Firefox-specific fixes for react_production
+            (function() {
+              // Firefox thường có vấn đề với thứ tự tải module, khiến react_production bị undefined
+              // Sử dụng MutationObserver để khắc phục sự cố khi DOM thay đổi
+              if (typeof MutationObserver === 'function') {
+                var observer = new MutationObserver(function(mutations) {
+                  if (!window.react_production) {
+                    // Nếu react_production bị reset thành undefined, tạo lại nó
+                    console.warn('[Firefox Fix] Detected react_production is undefined, restoring');
+                    window.react_production = window.react_production || {};
+                    window.react_production.jsx = function() { return null; };
+                    window.react_production.jsxs = function() { return null; };
+                    window.react_production.Fragment = Symbol('Fragment');
+                  }
+                });
+
+                // Theo dõi các thay đổi trong DOM
+                observer.observe(document.documentElement, {
+                  childList: true,
+                  subtree: true
+                });
+
+                // Ngừng quan sát sau 10 giây để tránh ảnh hưởng đến hiệu suất
+                setTimeout(function() {
+                  observer.disconnect();
+                }, 10000);
+              }
             })();
           </script>
           </head>`

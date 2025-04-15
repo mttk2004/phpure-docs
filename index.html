@@ -18,9 +18,10 @@
     <meta name="google-site-verification" content="7nq7RhtoVcqiZsU2S4c95sZhRDervDnQd6MqUB6yO5k" />
     <meta name="robots" content="index, follow" />
 
-    <!-- Load React preload script first - critical for preventing "react_production is undefined" errors -->
-    <!-- Thêm async=false và defer=false để đảm bảo script được tải và thực thi trước các script khác -->
-    <script src="/preload-react.js" async="false" defer="false"></script>
+    <!-- Load React preload script first - Firefox thường xử lý async/defer khác Chrome -->
+    <!-- Sửa: loại bỏ async=false và defer=false vì Firefox không xử lý chúng giống Chrome -->
+    <!-- Thay vào đó, đặt type="text/javascript" và không sử dụng async/defer để đảm bảo blocking execution -->
+    <script type="text/javascript" src="/preload-react.js"></script>
 
     <!-- Critical inline styles -->
     <style>

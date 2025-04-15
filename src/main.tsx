@@ -21,6 +21,65 @@ declare global {
   }
 }
 
+// CRITICAL FIX FOR FIREFOX: Xử lý đặc biệt cho Firefox
+(function detectFirefoxAndFix() {
+  // Kiểm tra nếu đây là trình duyệt Firefox
+  const isFirefox = typeof navigator !== 'undefined' && navigator.userAgent.indexOf('Firefox') !== -1;
+
+  if (isFirefox && typeof window !== 'undefined') {
+    console.debug('[React Init] Firefox detected, applying special fixes');
+
+    // 1. Tạo Object.defineProperty đặc biệt để đảm bảo react_production không bị undefined
+    type SafeReactProd = Record<string, unknown>;
+    let reactProdValue = window.react_production || {} as SafeReactProd;
+
+    // Tạo các phương thức cần thiết - sử dụng cast để tránh lỗi TypeScript
+    if (!reactProdValue.jsx) {
+      reactProdValue.jsx = React.createElement;
+    }
+
+    if (!reactProdValue.jsxs) {
+      reactProdValue.jsxs = React.createElement;
+    }
+
+    if (!reactProdValue.Fragment) {
+      reactProdValue.Fragment = React.Fragment;
+    }
+
+    try {
+      Object.defineProperty(window, 'react_production', {
+        configurable: true,
+        enumerable: true,
+        get: function() {
+          return reactProdValue;
+        },
+        set: function(newValue) {
+          if (newValue === undefined) {
+            console.warn('[React Init] Prevented Firefox from setting react_production to undefined');
+            return;
+          }
+          reactProdValue = newValue || reactProdValue;
+        }
+      });
+    } catch (e) {
+      console.error('[React Init] Firefox property definition error:', e);
+    }
+
+    // 2. Tạo một interval để liên tục kiểm tra và khôi phục react_production nếu nó bị undefined
+    const reactProdInterval = setInterval(() => {
+      if (!window.react_production) {
+        console.warn('[React Init] Restoring react_production in Firefox');
+        window.react_production = reactProdValue as ReactProductionType;
+      }
+    }, 50);
+
+    // Dừng interval sau 5 giây
+    setTimeout(() => {
+      clearInterval(reactProdInterval);
+    }, 5000);
+  }
+})();
+
 // CRITICAL FIX FOR PRODUCTION: Đảm bảo react_production luôn tồn tại trước React initialization
 (function ensureReactProductionExists() {
   // Kiểm tra và đảm bảo react_production được định nghĩa ngay từ đầu
