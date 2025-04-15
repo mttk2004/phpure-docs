@@ -423,7 +423,7 @@
   .code-block {
     position: relative;
     border-radius: 0.25rem;
-    overflow: hidden;
+    overflow: auto !important; /* Thay đổi từ hidden thành auto để cho phép cuộn ngang */
   }
   .code-block pre {
     margin: 0 !important;

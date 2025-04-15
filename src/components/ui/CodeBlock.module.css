@@ -2,10 +2,10 @@
   position: relative;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
   max-width: 100%;
-  overflow-x: hidden;
+  overflow-x: auto !important; /* Thay đổi từ hidden thành auto để cho phép cuộn ngang */
   transform: translateZ(0); /* Kích hoạt hardware acceleration */
   backface-visibility: hidden; /* Giúp tránh glitch khi thay đổi theme */
-  contain: paint; /* Cải thiện hiệu suất render */
+  contain: content; /* Thay đổi từ paint thành content */
   content-visibility: auto; /* Tối ưu việc render khi ngoài viewport */
   paint-order: normal;
   -webkit-font-smoothing: antialiased;
@@ -172,7 +172,7 @@
 /* Tùy chỉnh scrollbar */
 .codeContainer :global(pre)::-webkit-scrollbar,
 .codeContainer::-webkit-scrollbar {
-  height: 6px;
+  height: 8px; /* Tăng chiều cao của thanh cuộn ngang để dễ thấy hơn */
   width: 6px;
 }
 
@@ -244,7 +244,7 @@
 /* Tạo layer mới để tối ưu hiệu suất render */
 .codeContainer,
 .codeContainer * {
-  contain: layout style paint;
+  contain: style; /* Thay đổi từ 'layout style paint' sang chỉ 'style' */
 }
 
 /* Preload container styles - ngăn flash khi chuyển theme */

@@ -161,7 +161,7 @@ export function CodeBlock({
       ref={containerRef}
       style={{
         maxWidth: maxWidth || '100%',
-        overflowX: isMobile ? 'hidden' : 'auto'
+        overflowX: 'auto', // Luôn cho phép cuộn ngang bất kể thiết bị
       }}
       data-theme={isDarkTheme ? 'dark' : 'light'}
     >
@@ -171,7 +171,7 @@ export function CodeBlock({
         className={`w-full ${isMobile ? styles.mobileContainer : ''}`}
         style={{
           maxWidth: '100%',
-          overflowX: 'auto'
+          overflowX: 'auto', // Đảm bảo container bên trong cũng cho phép cuộn
         }}
       >
         <SyntaxHighlighter
@@ -188,7 +188,8 @@ export function CodeBlock({
             transition: 'none', // Loại bỏ hoàn toàn transition để tránh chớp
             lineHeight: '1.6',
             maxWidth: '100%',
-            overflow: 'auto',
+            overflow: 'auto !important', // Force enable scrolling with !important
+            overflowX: 'auto !important', // Explicitly set horizontal scrolling with !important
             whiteSpace: 'pre',
             tabSize: 4,
             MozTabSize: 4,
